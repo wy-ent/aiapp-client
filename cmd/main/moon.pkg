@@ -1,0 +1,7 @@
+// import {
+//   "username/aiapp-mb" @lib,
+// }
+
+options(
+  "is-main": true,
+)

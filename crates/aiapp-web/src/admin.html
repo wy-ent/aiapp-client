@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aiapp-mb · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf9f5;            /* Light warm-beige background */
+    --panel: #ffffff;
+    --panel-2: #f1efe7;       /* Secondary warm panel */
+    --border: #e3dfd3;        /* Light Gray */
+    --text: #141413;          /* Dark charcoal text */
+    --muted: #6f6d64;         /* Secondary text */
+    --accent: #d97757;        /* Orange primary accent */
+    --accent-2: #a8553a;      /* Dark orange: accent text/hover */
+    --ok: #788c5d;            /* Green */
+    --err: #b3412c;
+    --tag-bg: #f3f0e8;
+    --tag-border: #ded9ca;
+    --overlay: rgba(20,20,19,0.55);
+    --font-head: "Poppins", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-body: "Lora", Georgia, "PingFang SC", "Microsoft YaHei", serif;
+    --shadow: 0 10px 30px rgba(20,20,19,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Headings uniformly use the brand heading font Poppins */
+  .nav-tab, .mode-btn, .sec-title, .win-name, .modal h3, .auth-tab,
+  .admin-card h3, .stat-card .num, .tv-title, .mem-done, .app-mini-card h3,
+  .gen-toggle, .gen-submit, .custom-gen, .login-btn, .m-btn.primary {
+    font-family: var(--font-head);
+  }
+
+  /* ===== Top bar ===== */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 12px 24px; background: var(--panel);
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50;
+    flex-wrap: wrap;
+  }
+  .topbar .logo {
+    font-size: 20px; font-weight: 800; font-family: var(--font-head);
+    background: linear-gradient(135deg, #d97757, #a8553a);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    cursor: pointer; white-space: nowrap;
+  }
+  .topbar .logo small { font-size: 12px; -webkit-text-fill-color: var(--muted); }
+  .topbar-left { display: flex; align-items: center; gap: 18px; }
+  .nav-tabs { display: flex; gap: 6px; }
+  .nav-tab {
+    background: transparent; border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 16px; font-size: 13px; color: var(--muted); cursor: pointer;
+    transition: all .15s;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .topbar-right { display: flex; gap: 10px; align-items: center; }
+  .topbar .gen-toggle {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background .15s; white-space: nowrap;
+  }
+  .topbar .gen-toggle:hover { background: var(--accent-2); }
+  .topbar .gen-toggle.on { background: var(--panel-2); color: var(--muted); border: 1px solid var(--border); }
+  .topbar .stats { font-size: 13px; color: var(--muted); }
+  .lang-switch { display: flex; gap: 4px; align-items: center; }
+  .lang-btn {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 10px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .lang-btn:hover { color: var(--text); }
+  .lang-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ===== Generator drawer ===== */
+  .gen-drawer {
+    display: none; background: var(--panel); border-bottom: 1px solid var(--border);
+    padding: 20px 24px; position: sticky; top: 52px; z-index: 49;
+  }
+  .gen-drawer.show { display: block; }
+  .gen-drawer .mode-switch { display: flex; gap: 6px; margin-bottom: 12px; }
+  .gen-drawer .mode-btn {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 16px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .gen-drawer .mode-btn:hover { color: var(--text); }
+  .gen-drawer .mode-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .gen-drawer .update-target {
+    display: flex; gap: 10px; align-items: center; margin-bottom: 12px;
+    padding: 10px 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .gen-drawer .update-target select {
+    flex: 1; background: var(--panel); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px; font-size: 13px; outline: none;
+  }
+  .gen-drawer textarea {
+    width: 100%; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; font-family: inherit;
+    outline: none; min-height: 70px; resize: vertical;
+  }
+  .gen-drawer textarea:focus { border-color: var(--accent); }
+  .gen-drawer .gen-row {
+    display: flex; gap: 12px; align-items: center; margin-top: 12px; flex-wrap: wrap;
+  }
+  .gen-drawer .tpl-mini { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tpl-mini-btn {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; font-size: 12px; color: var(--muted);
+    cursor: pointer; transition: all .15s;
+  }
+  .tpl-mini-btn:hover { border-color: var(--muted); }
+  .tpl-mini-btn.on { border-color: var(--accent); color: var(--accent-2); }
+  .gen-drawer .gen-submit {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 8px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+    margin-left: auto;
+  }
+  .gen-drawer .gen-submit:hover { background: var(--accent-2); }
+  .gen-drawer .gen-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .gen-drawer .gen-result { margin-top: 10px; font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .gen-result .res-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .gen-result .res-btn {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 14px; font-size: 12px; color: var(--text); cursor: pointer; transition: all .15s;
+  }
+  .gen-result .res-btn:hover { border-color: var(--accent); }
+  .gen-result .res-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ===== Home page ===== */
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 20px 20px 80px; }
+
+  .avail-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  .avail-switch { display: flex; gap: 6px; align-items: center; }
+  .avail-btn {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 18px; font-size: 13px;
+    color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .avail-btn:hover { border-color: var(--muted); color: var(--text); }
+  .avail-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .avail-btn.on.warn { background: #fbf3e0; border-color: #8a6a1f; color: #8a6a1f; }
+  .current-device {
+    font-size: 12px; color: var(--muted); margin-left: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .current-device .dev-badge {
+    background: var(--tag-bg); color: var(--accent-2);
+    border: 1px solid var(--tag-border); border-radius: 4px; padding: 2px 8px;
+    font-size: 11px;
+  }
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .filter-bar .label { font-size: 12px; color: var(--muted); margin-right: 4px; }
+  .filter-chip {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 4px 12px; font-size: 12px;
+    color: var(--muted); cursor: pointer; transition: all .15s;
+    user-select: none;
+  }
+  .filter-chip:hover { border-color: var(--muted); color: var(--text); }
+  .filter-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter-chip.tag { border-radius: 4px; }
+
+  .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 1100px) { .app-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 800px) { .app-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .app-grid { grid-template-columns: 1fr; } }
+  .app-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; cursor: pointer;
+    box-shadow: 0 1px 2px rgba(20,20,19,0.04);
+    transition: border-color .15s, transform .1s, box-shadow .15s;
+  }
+  .app-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow); }
+  .app-card .app-thumb {
+    width: 100%; height: 120px; object-fit: cover; display: block;
+    background: linear-gradient(135deg, #f1efe7 0%, #e3dfd3 100%);
+  }
+  .app-card .app-body { padding: 14px; }
+  .app-card .app-name { font-size: 15px; font-weight: 700; font-family: var(--font-head); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .app-card .app-name .not-sup { font-size: 13px; }
+  .vis-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px;
+  }
+  .vis-badge.private { background: #fbf3e0; color: #8a6a1f; border: 1px solid #e5d5a8; }
+  .vis-badge.public { background: #eef3e4; color: #5c7044; border: 1px solid #cdd8b4; }
+  .vis-badge.review { background: #eaf2fb; color: #3f6fa8; border: 1px solid #c3d8ef; }
+  .vis-badge.danger { background: #fbeaec; color: #a84654; border: 1px solid #edc8cd; }
+  .ver-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px;
+    background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+  }
+  /* Category / share badges */
+  .app-meta-line { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+  .cat-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px;
+    background: #f3efe9; color: #7a6a55; border: 1px solid #e0d7c8;
+  }
+  .share-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px;
+    background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+  }
+  .share-badge.pub { background: #eef3e4; color: #5c7044; border: 1px solid #cdd8b4; }
+  .share-badge.org { background: #eaf2fb; color: #3f6fa8; border: 1px solid #c3d8ef; }
+  /* Generator category row */
+  .gen-drawer .cat-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .gen-drawer .gen-cat-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .gen-drawer .gen-cat-hint { font-size: 11px; color: var(--accent-2); }
+  .gen-drawer select {
+    flex: 1; min-width: 120px; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 7px; padding: 6px 8px; font-size: 13px;
+  }
+  /* Publish modal share scope */
+  .share-options { display: flex; gap: 8px; margin-top: 6px; }
+  .share-opt {
+    flex: 1; display: flex; align-items: flex-start; gap: 8px;
+    border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px;
+    cursor: pointer; background: var(--panel-2);
+  }
+  .share-opt b { font-size: 13px; display: block; }
+  .share-opt small { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; line-height: 1.4; }
+  .share-opt input { margin-top: 2px; accent-color: var(--accent); }
+  .app-card .app-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .app-card .app-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+  .app-tag {
+    font-size: 11px; background: var(--tag-bg); color: var(--accent-2);
+    border: 1px solid var(--tag-border); border-radius: 4px; padding: 2px 7px;
+  }
+  .app-card .app-platforms { display: flex; gap: 4px; flex-wrap: wrap; }
+  .plat-badge {
+    font-size: 11px; background: var(--panel-2); color: var(--muted);
+    border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px;
+  }
+  /* Online / local badge */
+  .app-card .app-net { display: flex; gap: 4px; margin-bottom: 10px; }
+  .net-badge {
+    font-size: 11px; font-weight: 600; border-radius: 4px; padding: 2px 7px;
+    border: 1px solid;
+  }
+  .net-badge.online { background: #eaf2fb; color: #3f6fa8; border-color: #c3d8ef; }
+  .net-badge.local  { background: #eef3e4; color: #5c7044; border-color: #cdd8b4; }
+  /* Instant-launch button */
+  .launch-btn {
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 10px;
+    background: var(--accent); border: 1px solid var(--accent); color: #fff;
+    border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .15s; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .launch-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .launch-btn.lg { width: 100%; justify-content: center; padding: 9px 14px; font-size: 14px; }
+  /* My Apps card action buttons */
+  .my-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .my-btn {
+    flex: 1; min-width: 0; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 7px; padding: 6px 6px; font-size: 12px; color: var(--muted);
+    cursor: pointer; transition: all .15s;
+  }
+  .my-btn:hover { border-color: var(--accent); color: var(--text); }
+  .my-btn.publish { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .my-btn.launch { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .my-btn.uninstall { border-color: var(--err); color: var(--err); }
+  .my-btn.uninstall:hover { background: var(--err); color: #fff; }
+  .my-btn.danger:hover { border-color: var(--err); color: var(--err); }
+  .market-empty { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--muted); }
+  .market-empty .big { font-size: 40px; margin-bottom: 12px; }
+  .market-empty p { font-size: 14px; line-height: 1.6; }
+
+  .sec-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .sec-title .sub { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+  /* ===== App window ===== */
+  .app-window {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: var(--overlay); backdrop-filter: blur(4px);
+  }
+  .app-window.show { display: flex; align-items: center; justify-content: center; }
+  .app-window .window-frame {
+    width: 90%; max-width: 680px; max-height: 85vh;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: windowIn .2s ease;
+  }
+  @keyframes windowIn { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .app-window.fully .window-frame {
+    width: 100%; max-width: 100%; height: 100%; max-height: 100%;
+    border-radius: 0; border: none; border-left: 1px solid var(--border);
+  }
+  .app-window .window-body { flex: 1; overflow: auto; padding: 20px; min-height: 300px; }
+  .app-window .window-titlebar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .app-window .window-titlebar .win-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .app-window .window-titlebar .win-name { font-size: 15px; font-weight: 700; }
+  .app-window .window-titlebar .win-platforms { display: flex; gap: 4px; }
+  .app-window .window-titlebar .win-actions { display: flex; gap: 8px; }
+  .win-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--muted); font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .win-btn:hover { background: var(--panel-2); color: var(--text); }
+  .win-btn.close:hover { background: #b3412c; color: #fff; border-color: #b3412c; }
+  .app-window .mock-content {
+    font-family: "SF Mono", Consolas, "Courier New", monospace;
+    font-size: 13px; line-height: 1.6; white-space: pre; color: var(--text);
+    background: #f4f2ea; border: 1px solid var(--border); border-radius: 10px; padding: 20px;
+  }
+  .app-window .run-area { display: flex; flex-direction: column; gap: 12px; }
+  .app-window .run-toolbar { display: flex; align-items: center; gap: 12px; }
+  .app-window .run-btn {
+    background: linear-gradient(135deg, #d97757, #a8553a); color: #fff; border: 0;
+    border-radius: 8px; padding: 8px 16px; font-size: 13px; cursor: pointer;
+  }
+  .app-window .run-btn:disabled { opacity: .6; cursor: default; }
+  .app-window .run-status { font-size: 12px; color: var(--muted); }
+  .app-window .run-output {
+    font-family: "SF Mono", Consolas, "Courier New", monospace;
+    font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+    color: var(--text); background: #f4f2ea; border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px; min-height: 120px;
+  }
+  .app-window .run-output.err { color: #b3412c; }
+  .app-window .window-owner {
+    display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);
+    border-top: 1px solid var(--border); padding: 10px 18px; background: var(--panel);
+  }
+  .app-window .window-source {
+    border-top: 1px solid var(--border); padding: 14px 18px; background: var(--panel-2);
+  }
+  .app-window .window-source .custom-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .app-window .custom-btns { display: flex; gap: 8px; align-items: center; }
+  .app-window .custom-gen {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background .15s;
+  }
+  .app-window .custom-gen:hover { background: var(--accent-2); }
+  .app-window .report-btn {
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; transition: all .15s;
+  }
+  .app-window .report-btn:hover { border-color: var(--err); color: var(--err); }
+
+  /* ===== Interactive app UI (real operable UI rendered per template) ===== */
+  .app-ui { display: flex; flex-direction: column; gap: 14px; }
+  .app-mini-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .app-mini-card h3 { margin: 0 0 8px; font-size: 15px; }
+  .app-mini-card p { margin: 4px 0; color: var(--muted); font-size: 13px; }
+  /* Todo */
+  .todo-add { display: flex; gap: 8px; }
+  .todo-add input { flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); }
+  .todo-add button { padding: 0 18px; border-radius: 8px; border: 0; background: var(--accent); color: #fff; cursor: pointer; font-weight: 600; }
+  .todo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .todo-item { display: flex; align-items: center; gap: 10px; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; }
+  .todo-item.done .todo-text { text-decoration: line-through; color: var(--muted); }
+  .todo-item .todo-del { margin-left: auto; cursor: pointer; color: var(--muted); border: none; background: none; font-size: 16px; }
+  .todo-item .todo-del:hover { color: var(--err); }
+  /* Image filter */
+  .img-filter { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  .img-filter canvas { max-width: 100%; border-radius: 10px; border: 1px solid var(--border); background: #f4f2ea; }
+  .img-filter .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .img-filter .filter-bar button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); cursor: pointer; }
+  .img-filter .filter-bar button:hover { background: var(--panel-2); }
+  /* Focus pomodoro */
+  .pomodoro .pm-ring { text-align: center; padding: 20px 0 8px; }
+  .pomodoro .pm-time { font-size: 46px; font-weight: 800; font-family: var(--font-head); letter-spacing: 2px; }
+  .pomodoro .pm-mode { font-size: 14px; color: var(--muted); margin-top: 4px; }
+  .pomodoro .pm-progress { height: 8px; background: var(--panel-2); border-radius: 999px; margin: 14px auto 0; max-width: 320px; overflow: hidden; }
+  .pomodoro .pm-fill { height: 100%; width: 0; background: linear-gradient(90deg,#d97757,#f0b27a); transition: width 1s linear; }
+  .pomodoro .pm-btns { display: flex; gap: 10px; justify-content: center; }
+  .pomodoro .pm-btn { padding: 10px 26px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--accent); color: #fff; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .pomodoro .pm-btn:hover { background: var(--accent-2); }
+  .pomodoro .pm-stats { text-align: center; font-size: 13px; color: var(--muted); }
+  .pomodoro .pm-log { display: flex; flex-direction: column; gap: 6px; }
+  .pomodoro .pm-log-item { font-size: 13px; color: var(--muted); background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; }
+  .pomodoro .pm-log-empty { font-size: 13px; color: var(--muted); text-align: center; padding: 12px; }
+  /* Kids memory match */
+  .memory .mem-top { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .memory .mem-top b { color: var(--text); }
+  .memory .mem-new { margin-left: auto; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); cursor: pointer; font-size: 13px; }
+  .memory .mem-new:hover { border-color: var(--accent); }
+  .memory .mem-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .memory .mem-card {
+    aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--border);
+    background: linear-gradient(135deg, #f1efe7, #e3dfd3); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: transform .12s;
+  }
+  .memory .mem-card:hover { transform: scale(1.03); }
+  .memory .mem-card .mem-sym { opacity: 0; font-size: 32px; transition: opacity .15s; }
+  .memory .mem-card.on .mem-sym, .memory .mem-card.ok .mem-sym { opacity: 1; }
+  .memory .mem-card.on { background: var(--panel-2); border-color: var(--accent); }
+  .memory .mem-card.ok { background: #eef3e4; border-color: #788c5d; }
+  .memory .mem-done { text-align: center; font-size: 16px; font-weight: 700; color: var(--ok); }
+  /* Family movie list */
+  .tv .tv-cats { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tv .tv-cat { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--muted); cursor: pointer; font-size: 13px; }
+  .tv .tv-cat.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tv .tv-list { display: flex; flex-direction: column; gap: 8px; }
+  .tv .tv-item { display: flex; align-items: center; gap: 12px; background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .tv .tv-num { font-size: 16px; }
+  .tv .tv-title { flex: 1; font-size: 15px; font-weight: 600; }
+  .tv .tv-cat-tag { font-size: 12px; color: var(--muted); background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 2px 8px; }
+  .tv .tv-fav { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--muted); cursor: pointer; font-size: 13px; }
+  .tv .tv-fav:hover { border-color: var(--accent); color: var(--text); }
+  .tv .tv-empty { text-align: center; color: var(--muted); padding: 20px; }
+  .tv .tv-add { display: flex; gap: 8px; }
+  .tv .tv-add input { flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); font-size: 14px; }
+  .tv .tv-add select { padding: 9px 10px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); font-size: 13px; }
+  .tv .tv-addbtn { padding: 0 18px; border-radius: 8px; border: 0; background: var(--accent);
+    color: #fff; cursor: pointer; font-weight: 600; }
+
+  /* ===== Task bar ===== */
+  .taskbar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+    background: var(--panel); border-top: 1px solid var(--border);
+    padding: 6px 16px; display: none; gap: 6px; align-items: center;
+  }
+  .taskbar.show { display: flex; }
+  .taskbar .task-label { font-size: 11px; color: var(--muted); margin-right: 6px; }
+  .task-icon {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 10px; cursor: pointer;
+    font-size: 12px; transition: all .15s;
+  }
+  .task-icon:hover { border-color: var(--accent); }
+  .task-icon .task-close {
+    font-size: 14px; color: var(--muted); margin-left: 4px;
+    width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+  }
+  .task-icon .task-close:hover { background: #b3412c; color: #fff; }
+
+  /* ===== Publish modal ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: var(--overlay); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    width: 92%; max-width: 440px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+    animation: windowIn .2s ease;
+  }
+  .modal h3 { font-size: 18px; margin-bottom: 4px; }
+  .modal .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+  .modal label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
+  .modal input, .modal textarea, .modal select {
+    width: 100%; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+    font-size: 14px; font-family: inherit; outline: none;
+  }
+  .modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--accent); }
+  .modal textarea { min-height: 60px; resize: vertical; }
+  .modal .modal-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .modal .m-btn {
+    padding: 9px 20px; border-radius: 8px; font-size: 14px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+    transition: all .15s;
+  }
+  .modal .m-btn:hover { border-color: var(--muted); }
+  .modal .m-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .modal .m-btn.primary:hover { background: var(--accent-2); }
+
+  /* ===== Login / register ===== */
+  .auth-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .auth-tab {
+    flex: 1; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px; color: var(--muted); cursor: pointer; font-size: 13px;
+    transition: all .15s;
+  }
+  .auth-tab:hover { color: var(--text); }
+  .auth-tab.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .auth-msg { font-size: 12px; min-height: 16px; margin-top: 8px; }
+  .auth-msg.err { color: var(--err); }
+  .auth-msg.ok { color: var(--ok); }
+  .topbar .user-chip { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+  .topbar .user-chip .uname { color: var(--accent-2); font-weight: 600; }
+  .topbar .user-chip .role-badge { font-size: 10px; padding: 1px 7px; border-radius: 4px; background: var(--tag-bg); color: var(--accent-2); border: 1px solid var(--tag-border); }
+  .topbar .user-chip button {
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--muted);
+    border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 12px;
+  }
+  .topbar .user-chip button:hover { color: var(--text); }
+  .topbar .login-btn {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .topbar .login-btn:hover { background: var(--accent-2); }
+
+  /* ===== Admin ===== */
+  .admin-layout { display: flex; gap: 20px; align-items: flex-start; }
+  .admin-menu {
+    width: 210px; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 8px; position: sticky; top: 70px;
+    flex-shrink: 0;
+  }
+  .admin-menu-item {
+    display: block; width: 100%; text-align: left; background: transparent;
+    border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px;
+    color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .admin-menu-item:hover { color: var(--text); background: var(--panel-2); }
+  .admin-menu-item.on { background: var(--accent); color: #fff; }
+  .admin-panel { flex: 1; min-width: 0; }
+  .admin-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px; margin-bottom: 16px;
+  }
+  .admin-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .admin-card .sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .stat-card {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; text-align: center;
+  }
+  .stat-card .num { font-size: 26px; font-weight: 800; color: var(--accent-2); }
+  .stat-card .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .admin-table th, .admin-table td {
+    text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .admin-table th { color: var(--muted); font-weight: 600; font-size: 12px; white-space: nowrap; }
+  .admin-table tr:hover td { background: var(--panel-2); }
+  .a-badge {
+    display: inline-block; font-size: 11px; border-radius: 4px;
+    padding: 2px 8px; background: var(--panel-2); color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .a-badge.published { background: #eef3e4; color: #5c7044; border-color: #cdd8b4; }
+  .a-badge.reviewing { background: #fbf3e0; color: #8a6a1f; border-color: #e5d5a8; }
+  .a-badge.draft { background: #f1efe7; color: #6f6d64; border-color: var(--border); }
+  .a-badge.disabled { background: #fbeae4; color: #b3412c; border-color: #e3b8ab; }
+  .a-badge.active { background: #eef3e4; color: #5c7044; border-color: #cdd8b4; }
+  .a-badge.admin { background: #e8f0f8; color: #3a6f9c; border-color: #bfd6e8; }
+  .admin-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .small-btn {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; font-size: 12px; color: var(--text); cursor: pointer; transition: all .15s;
+  }
+  .small-btn:hover { border-color: var(--accent); }
+  .small-btn.ok { border-color: #7a9458; color: #5c7044; }
+  .small-btn.warn { border-color: #b89a45; color: #8a6a1f; }
+  .small-btn.danger { border-color: #c96a48; color: #b3412c; }
+  .small-btn.danger:hover { background: #fbeae4; }
+  .small-btn.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .a-note { font-size: 11px; color: var(--muted); }
+  .prompt-box { width: 100%; min-height: 320px; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    font-family: "SF Mono", Consolas, monospace; font-size: 13px; line-height: 1.6; outline: none; }
+  .prompt-box:focus { border-color: var(--accent); }
+  .prompt-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+
+  /* ===== Admin search & filter ===== */
+  .admin-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .admin-search {
+    flex: 1; min-width: 180px; padding: 8px 12px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+    font-size: 13px; outline: none; font-family: var(--font-body);
+  }
+  .admin-search:focus { border-color: var(--accent); }
+  .admin-select {
+    padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); font-size: 13px; cursor: pointer; outline: none;
+  }
+  .admin-cat-chart { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .cat-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .cat-bar-label { font-size: 12px; color: var(--muted); white-space: nowrap; min-width: 70px; }
+  .cat-bar-track { flex: 1; height: 20px; background: var(--panel-2); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+  .cat-bar-fill { height: 100%; border-radius: 6px; transition: width .3s; }
+  .cat-bar-num { font-size: 12px; color: var(--text); font-weight: 600; min-width: 24px; text-align: right; }
+
+  /* ===== Edit modal ===== */
+  .edit-modal-overlay {
+    position: fixed; inset: 0; background: var(--overlay);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+  }
+  .edit-modal-overlay.show { display: flex; }
+  .edit-modal {
+    background: var(--panel); border-radius: 14px; padding: 24px;
+    width: 90%; max-width: 520px; box-shadow: var(--shadow); max-height: 90vh; overflow-y: auto;
+  }
+  .edit-modal h3 { font-size: 18px; margin-bottom: 16px; }
+  .edit-field { margin-bottom: 14px; }
+  .edit-field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .edit-field input, .edit-field textarea {
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+    font-size: 13px; outline: none; font-family: var(--font-body);
+  }
+  .edit-field input:focus, .edit-field textarea:focus { border-color: var(--accent); }
+  .edit-field textarea { min-height: 80px; resize: vertical; }
+  .edit-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+  .loading-hint { text-align: center; padding: 30px; color: var(--muted); font-size: 14px; }
+
+  .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 40px; line-height: 1.8; }
+
+  /* ===== Mobile adaptation ===== */
+  @media (max-width: 768px) {
+    .topbar { padding: 10px 14px; }
+    .nav-tab { padding: 7px 10px; font-size: 12px; }
+    .wrap { padding: 14px 12px 80px; }
+    .sec-title { font-size: 15px; flex-wrap: wrap; }
+    .avail-bar, .filter-bar { gap: 6px; }
+    .app-window .window-titlebar { padding: 10px 12px; }
+    .app-window .window-titlebar .win-name { font-size: 14px; }
+    .app-window .window-body { padding: 14px; }
+    .app-window .window-source { padding: 12px; }
+    .app-window .window-source .custom-row { flex-wrap: wrap; }
+    .app-window .custom-btns { flex-wrap: wrap; }
+    .calc-display { font-size: 20px; padding: 12px 12px; }
+    .admin-layout { flex-direction: column; gap: 12px; }
+    .admin-menu { width: 100%; position: static; display: flex; flex-wrap: wrap; gap: 6px; }
+    .admin-menu-item { width: auto; padding: 8px 12px; }
+    .admin-table th, .admin-table td { padding: 8px 8px; }
+  }
+  @media (max-width: 480px) {
+    .topbar-left { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .topbar-right { width: 100%; justify-content: space-between; }
+    .app-card .app-thumb { height: 100px; }
+  }
+
+</head>
+<body>
+
+<!-- ===== Admin header ===== -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo">aiapp&#8209;mb <small data-i18n="Admin Console">Admin Console</small></div>
+  </div>
+  <div class="topbar-right">
+    <span class="lang-switch" id="langSwitch">
+      <button class="lang-btn" data-lang="zh-CN" onclick="setLang('zh-CN')">中文</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </span>
+    <span id="authArea"></span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="admin-layout">
+    <div class="admin-menu" id="adminMenu">
+      <button class="admin-menu-item on" data-panel="stats" data-i18n="📊 Usage Stats">📊 Usage Stats</button>
+      <button class="admin-menu-item" data-panel="apps" data-i18n="📦 App Management">📦 App Management</button>
+      <button class="admin-menu-item" data-panel="users" data-i18n="👥 User Management">👥 User Management</button>
+      <button class="admin-menu-item" data-panel="prompt" data-i18n="🤖 Generation Prompt">🤖 Generation Prompt</button>
+    </div>
+    <div class="admin-panel">
+      <div id="panelStats"></div>
+      <div id="panelApps" hidden></div>
+      <div id="panelUsers" hidden></div>
+      <div id="panelPrompt" hidden></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Admin login ===== -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <h3 data-i18n="Log in to aiapp">Log in to aiapp</h3>
+    <label data-i18n="Username">Username</label>
+    <input id="authUser" data-i18n-ph="Username" placeholder="Username" autocomplete="username" />
+    <label style="margin-top:14px" data-i18n="Password">Password</label>
+    <input id="authPass" type="password" data-i18n-ph="Password (at least 6 characters)" placeholder="Password (at least 6 characters)" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')authSubmit()" />
+    <div class="auth-msg" id="authMsg"></div>
+    <div class="modal-actions">
+      <button class="m-btn primary" id="authSubmitBtn" onclick="authSubmit()" data-i18n="Log in">Log in</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Edit app modal ===== -->
+<div class="edit-modal-overlay" id="editModal">
+  <div class="edit-modal">
+    <h3 data-i18n="Edit App">Edit App</h3>
+    <input type="hidden" id="editAppId" />
+    <div class="edit-field">
+      <label data-i18n="App name">App name</label>
+      <input id="editName" type="text" />
+    </div>
+    <div class="edit-field">
+      <label data-i18n="Description">Description</label>
+      <textarea id="editDesc"></textarea>
+    </div>
+    <div class="edit-field">
+      <label data-i18n="Tags (comma-separated)">Tags (comma-separated)</label>
+      <input id="editTags" type="text" />
+    </div>
+    <div class="edit-field">
+      <label data-i18n="Platforms (comma-separated)">Platforms (comma-separated)</label>
+      <input id="editPlatforms" type="text" />
+    </div>
+    <div class="edit-modal-actions">
+      <button class="small-btn" onclick="closeEditModal()" data-i18n="Cancel">Cancel</button>
+      <button class="small-btn ok" onclick="submitEditApp()" data-i18n="💾 Save">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPPORTED_LANGS = ['en', 'zh-CN'];
+const I18N_ZH = {
+  '· AI-native': '· AI 原生',
+  '🛍 App Market': '🛍 应用市场',
+  '👤 My Apps': '👤 我的应用',
+  '🛠 Admin': '🛠 管理后台',
+  '✨ Generate App': '✨ 生成新应用',
+  '🆕 New App': '🆕 新建应用',
+  '🔄 Update App': '🔄 更新应用',
+  'App to update:': '要更新的应用：',
+  'Describe the app you want, e.g. build a small tool that sums this month\'s incoming payments and groups them by date': '描述你想要的应用，比如：做一个统计本月到账金额的小工具，按日期汇总',
+  'Category:': '应用分类：',
+  'Auto-detect': '自动识别',
+  '✨ Generate': '✨ 生成',
+  'Apps you have launched are collected here automatically; apps you create can be published to the market': '启动过的应用会自动收录到这里；自己创建的应用可发布到市场',
+  '📊 Usage Stats': '📊 使用统计',
+  '📦 App Management': '📦 应用管理',
+  '👥 User Management': '👥 用户管理',
+  '🤖 Generation Prompt': '🤖 生成提示词',
+  'Minimize to background': '最小化到后台',
+  'Maximize': '最大化',
+  'Close app': '关闭应用',
+  'Report': '举报',
+  '📌 Running in background': '📌 后台运行',
+  '🚀 Publish to App Market': '🚀 发布到应用市场',
+  'Auto review by category: tool / office apps auto-approve; the rest enter manual review': '按分类自动审核：工具 / 办公类自动通过，其余进入人工审核',
+  'App name *': '应用名称 *',
+  'Give your app a good name': '给应用起个好名字',
+  'App description': '应用描述',
+  'Describe in one sentence what this app does': '用一句话说明这个应用是做什么的',
+  'Category': '应用分类',
+  'Share scope': '共享范围',
+  'Public': '公开共享',
+  'Published to the app center, visible to everyone': '发布到应用中心，所有人可见',
+  'Org': '组织共享',
+  'Visible only to members of the org': '仅组织内成员可见',
+  'Tags (separate with Chinese or English commas)': '标签（用中文逗号或英文逗号分隔）',
+  'Utilities, Office': '实用工具, 办公效率',
+  'Supported platforms (separate with commas)': '支持平台（用逗号分隔）',
+  'Web, Mobile, macOS, Windows, HarmonyOS, Car, TV Box': '网页, 手机, macOS, Windows, 鸿蒙, 车机, 电视盒',
+  'Leave tags and platforms empty to skip them; they become filterable in the market after publishing': '标签和平台留空则不填写，发布后可在市场中筛选',
+  'Cancel': '取消',
+  'Publish': '发布',
+  'Log in': '登录',
+  'Register': '注册',
+  'Username': '用户名',
+  'Password': '密码',
+  'Password (at least 6 characters)': '密码（至少 6 位）',
+  'aiapp-mb · AI-native apps, one codebase, cross-platform everywhere': 'aiapp-mb · AI 原生应用，一份代码，通用跨平台运行',
+  'Collapse': '收起',
+  '(No app available)': '（暂无应用可选）',
+  '✗ Please select the app to update first': '✗ 请先选择要更新的应用',
+  'Will update "{{name}}" based on your new description.\nA new version will be created (v{{ver}} -> v{{next}}) and will take effect after the owner (you) approves.\nContinue?': '将根据你的新描述更新「{{name}}」。\n生成后会新增一个版本（v{{ver}} -> v{{next}}），需所有者（你）同意后生效。\n确定继续吗？',
+  'Generating…': '生成中…',
+  'Generation failed': '生成失败',
+  'Updated to new version v{{ver}} (only visible to you)': '已更新到新版本 v{{ver}}（仅你可使用）',
+  'New app created (only visible to you)': '已新建应用（仅你可使用）',
+  '▶ Use Now': '▶ 立即使用',
+  '🚀 Publish to Market': '🚀 发布到市场',
+  'View My Apps': '查看我的应用',
+  'Reference "{{name}}" to improve this app: ': '参考「{{name}}」优化这个应用：',
+  'Reference "{{name}}" to make a similar app: ': '参考「{{name}}」做一个类似的应用：',
+  'Improve "{{name}}":': '优化「{{name}}」：',
+  'Failed to load: {{msg}}': '加载失败：{{msg}}',
+  'Category': '分类',
+  'Current device: ': '当前设备：',
+  '✅ Available Now': '✅ 当前可用',
+  '🚫 Other Platforms': '🚫 其他平台可用',
+  'Market {{n}} apps': '市场 {{n}} 款',
+  'All apps that work on this device are here<br>Click "✨ Generate App" at the top to make your own': '当前设备可用的应用都在这了<br>可以点顶部「✨ 生成新应用」做一个',
+  'These apps run on other platforms<br>Switch back to "Available Now" to see what works on this device': '这些应用都能在其他平台运行<br>切回「当前可用」看本机可用的应用',
+  'online': '联网',
+  'local': '本地',
+  'Not supported on this device': '当前设备不支持',
+  '⚡ Instant Launch': '⚡ 秒启动',
+  'Published': '已发布',
+  'Under Review': '审核中',
+  'Disabled': '已停用',
+  'Draft': '草稿',
+  '🌐 Public': '🌐 公开',
+  '🏢 Org': '🏢 组织',
+  '🔒 Private': '🔒 私有',
+  'Share link copied:\n{{url}}': '已复制分享链接：\n{{url}}',
+  'Copy this link to share with others:': '复制这条链接分享给其他人：',
+  'No apps yet<br>Apps you use via "⚡ Instant Launch" in the market are collected here automatically<br>You can also click "✨ Generate App" at the top to create your own': '还没有应用<br>去市场点「⚡ 秒启动」用过的应用会自动收录到这里<br>也可以点顶部「✨ 生成新应用」自己创建',
+  '📄 Publish Settings': '📄 发布设置',
+  '🚀 Publish': '🚀 发布',
+  '🔄 Update': '🔄 更新',
+  '🔗 Share': '🔗 分享',
+  '🗑 Delete': '🗑 删除',
+  '🗑 Uninstall': '🗑 卸载',
+  'Saved': '已收藏',
+  'Delete app "{{name}}"?\n\nDeleting will also permanently remove all data this app saved on this device (todos, lists, best records, etc.), and it cannot be recovered.\nIf you need to keep the data, back it up first.': '确定删除应用「{{name}}」吗？\n\n删除后将同时清除该应用在本机保存的全部数据（待办、片单、最佳纪录等），不可恢复。\n如需保留数据，请先自行备份。',
+  'Delete failed': '删除失败',
+  'Uninstall app "{{name}}"?\n\nUninstalling will also permanently delete all data this app saved on this device (todos, lists, best records, etc.), and it cannot be recovered.\nIf you need to keep the data, back up the storage first.': '卸载应用「{{name}}」？\n\n卸载后将同时删除该应用在本机保存的全部数据（待办、片单、最佳纪录等），且不可恢复。\n如需保留数据，请先自行备份存储。',
+  'Uninstall failed': '卸载失败',
+  'Please enter an app name': '请填写应用名称',
+  'Publish failed': '发布失败',
+  'App not found': '应用不存在',
+  'Failed to open: {{msg}}': '打开失败：{{msg}}',
+  'Owner: ': '所有者：',
+  'Me': '我',
+  '🔗 Share Link': '🔗 分享链接',
+  '🔄 Update This App': '🔄 更新此应用',
+  'Generate a New App Based on This One': '基于此应用为生成新应用',
+  '(No description yet)': '（暂无描述）',
+  'Type: ': '类型：',
+  'Version: ': '版本：',
+  'Add a todo item…': '添加待办事项…',
+  'Add': '添加',
+  '⏳ Loading from local SQLite…': '⏳ 正在从本地 SQLite 加载…',
+  'Original': '原图',
+  'Grayscale': '灰度',
+  'Invert': '反色',
+  'Sepia': '复古',
+  'Please pick an image first': '请先选择一张图片',
+  'Focus': '专注',
+  'Break': '休息',
+  'Start': '开始',
+  'Pause': '暂停',
+  'Resume': '继续',
+  'Reset': '重置',
+  'Focus {{n}} sessions today': '今日专注 {{n}} 次',
+  'Start a pomodoro!': '开始一个番茄钟吧',
+  'Focus {{n}} · Break {{m}}': '专注 {{n}} 次 · 休息 {{m}} 次',
+  'Left {{n}} cards': '剩余 {{n}} 张',
+  'Moves {{n}}': '步数 {{n}}',
+  'Best {{n}}': '最佳 {{n}}',
+  'New': '重开',
+  '🎉 New record!': '🎉 新纪录！',
+  '🎉 Done!': '🎉 完成！',
+  'Movie name': '影片名称',
+  'Sci-Fi': '科幻',
+  'Animation': '动画',
+  'Documentary': '纪录片',
+  'Comedy': '喜剧',
+  'No movies in this category': '该分类暂无影片',
+  'Save': '收藏',
+  'Saved {{n}} movies': '收藏 {{n}} 部',
+  'Restore window': '还原窗口',
+  'Please briefly describe why you are reporting "{{name}}":': '请简要说明举报「{{name}}」的原因：',
+  'Report failed': '举报失败',
+  'Thanks, your report on "{{name}}" has been received. The admin will review it.': '已收到你对「{{name}}」的举报，管理员会在后台核查处理。',
+  'Report failed: {{msg}}': '举报失败：{{msg}}',
+  'Admin': '管理员',
+  'Admin Console': '管理后台',
+  'User': '用户',
+  'Active': '正常',
+  '📊 Platform Overview': '📊 平台概览',
+  'Overview of app usage, providing data for future operations such as user incentives and ad revenue share': '应用使用情况总览，为后续用户激励、广告分成等运营提供数据依据',
+  'Total Apps': '应用总数',
+  'Total Launches': '累计启动',
+  'Registered Users': '注册用户',
+  'Active Users': '活跃用户',
+  'Incentives Issued': '已发放激励',
+  '🏆 Top Popular Apps': '🏆 热门应用 TOP',
+  'Sorted by launch count': '按启动次数排序',
+  'No data': '暂无数据',
+  '👥 User Contribution': '👥 用户贡献',
+  'Generated apps and launches (incentive is placeholder data for a future incentive plan)': '生成数与启动量（激励为后续激励计划的占位数据）',
+  '✅ Approve': '✅ 通过',
+  '⛔ Reject': '⛔ 驳回',
+  '🛑 Disable': '🛑 停用',
+  '✏️ Edit': '✏️ 编辑',
+  '▶ Restore': '▶ 恢复',
+  '🚀 Publish': '🚀 上架',
+  'Review, publish, disable, edit and take down apps. Newly published apps enter "Under Review" and only become public on the market after approval': '审核、上架、停用、编辑与下架。新发布的应用进入“审核中”，通过后才对市场公开',
+  'All': '全部',
+  'Please enter the rejection reason:': '请填写驳回意见：',
+  'Operation failed': '操作失败',
+  'App name:': '应用名称：',
+  'App description:': '应用描述：',
+  'Tags (comma-separated):': '标签（逗号分隔）：',
+  'Supported platforms (comma-separated):': '支持平台（逗号分隔）：',
+  'Edit failed': '编辑失败',
+  'Delete this app? This cannot be undone.': '确定删除该应用吗？此操作不可恢复。',
+  '▶ Enable': '▶ 启用',
+  'Manage platform users; enable / disable accounts (single-user prototype with preset sample users)': '管理平台用户，可启用 / 停用账号（单用户原型，预置示例用户）',
+  '🤖 Generation Skill Prompt': '🤖 生成应用技能提示词',
+  'The text is maintained independently with versioning and structured sections for continuous online iteration; changes take effect immediately for subsequent generations after saving': '文本独立维护、带版本号、结构化分区，可在线持续迭代；保存后对后续生成立即生效',
+  'Version {{v}}': '版本 {{v}}',
+  '↺ Restore Built-in Default': '↺ 恢复内置默认',
+  '💾 Save & Apply': '💾 保存生效',
+  'Save failed': '保存失败',
+  'Saved and applied; future generations will use the latest prompt.': '已保存并生效，后续生成将使用最新提示词。',
+  'Restore the built-in default prompt? Your current edits will be overwritten.': '恢复为内置默认提示词？当前编辑内容将被覆盖。',
+  'Restore failed': '恢复失败',
+  'Built-in default prompt restored. Click "Save & Apply" to make it take effect.': '已恢复内置默认提示词，点“保存生效”使其生效。',
+  'Log out': '退出',
+  'Log in / Register': '登录 / 注册',
+  'Admin permission required': '需要管理员权限',
+  'Create Account': '注册新账号',
+  'Log in to aiapp': '登录 aiapp',
+  'Register & Log in': '注册并登录',
+  'Please enter a username': '请输入用户名',
+  'Please enter a password': '请输入密码',
+  'Password must be at least 6 characters': '密码至少 6 位',
+  'Processing…': '处理中…',
+  'Success, entering…': '成功，正在进入…',
+  'Network error: {{msg}}': '网络错误：{{msg}}',
+  'minimal': '极简',
+  'todo': '待办',
+  'image-filter': '图片滤镜',
+  'pomodoro': '番茄钟',
+  'memory-game': '记忆翻牌',
+  'tv-movies': '影音片单',
+  'App category': '应用分类',
+  'Category filter': '分类',
+  'Add failed: {{msg}}': '添加失败：{{msg}}',
+  'Collected': '已收录',
+  'Left': '剩余',
+  'Moves': '步数',
+  'Best': '最佳',
+  'cards': '张',
+  'Minimal': '极简',
+  'Todo': '待办',
+  'Image Filter': '图片滤镜',
+  'Pomodoro': '番茄钟',
+  'Memory Game': '记忆翻牌',
+  'Family Movies': '影音片单',
+  'App': '应用',
+  'Owner': '所有者',
+  'Status': '状态',
+  'Launches': '启动次数',
+  'Tags': '标签',
+  'Platforms': '平台',
+  'Reports': '举报',
+  'Review Note': '审核意见',
+  'Actions': '操作',
+  'Role': '角色',
+  'Generated': '生成应用',
+  'Incentive': '激励',
+  'Car': '车机',
+  'Mobile': '手机',
+  'Tablet': '平板',
+  'Desktop': '电脑',
+  'Category auto-derived from template': '按模板自动推导分类',
+  'This category requires manual review; it enters the review queue after publishing': '该分类需人工审核，发布后进入审核队列',
+  'Tool / office categories auto-approve; publish directly after generation': '工具 / 办公类自动审核通过，生成后可直接发布',
+  'Utilities': '实用工具',
+  'Office': '办公协作',
+  'Entertainment': '影音娱乐',
+  'Games': '小游戏',
+  'Family & Kids': '亲子教育',
+  'Life & Health': '生活健康',
+  'Industry': '行业应用',
+  'Other': '其他',
+  'Search apps…': '搜索应用…',
+  'All Categories': '全部分类',
+  'Search users…': '搜索用户…',
+  'No data': '暂无数据',
+  'Loading…': '加载中…',
+  'Edit App': '编辑应用',
+  'App name': '应用名称',
+  'Description': '应用描述',
+  'Tags (comma-separated)': '标签（逗号分隔）',
+  'Platforms (comma-separated)': '支持平台（逗号分隔）',
+  'Cancel': '取消',
+  '💾 Save': '💾 保存',
+  'Edit failed': '编辑失败',
+  'Category Distribution': '分类分布',
+  'App counts by category': '各分类应用数量分布',
+  'No data': '暂无数据',
+};
+let currentLang = (() => {
+  const saved = localStorage.getItem('aiapp_lang');
+  if (saved && SUPPORTED_LANGS.includes(saved)) return saved;
+  return (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh-CN' : 'en';
+})();
+const TPL_TO_LABEL = { minimal: 'Minimal', todo: 'Todo', 'image-filter': 'Image Filter', pomodoro: 'Pomodoro', 'memory-game': 'Memory Game', 'tv-movies': 'Family Movies' };
+// Canonical bilingual display names/descriptions for built-in sample apps (independent of stored data,
+// so both zh-CN and en modes show correct names even with a legacy database).
+const SEED_LOC = {
+  'quit-smoking': { en: 'Quit Smoking Tracker', zh: '戒烟打卡', enDesc: 'Track smoke-free time, money saved, and health recovery milestones with daily progress, craving log, and achievement badges', zhDesc: '追踪戒烟时长、节省金额和健康恢复里程碑，含每日进展、渴望日志和成就徽章，帮你坚持戒烟' },
+  'learn-english': { en: 'Daily English Learning', zh: '每日学英语', enDesc: 'Categorized vocabulary, sentence patterns, listening quizzes, streak tracking, and progress dashboard for daily English practice', zhDesc: '分类词汇、句型练习、听力小测、连续打卡和进度面板，每天进步一点点' },
+  'emergency-room': { en: 'Emergency Command Center', zh: '应急指挥室', enDesc: 'Emergency contact panel, medical info card, household emergency checklists, and step-by-step crisis response guides', zhDesc: '紧急联系人面板、医疗信息卡、家庭应急清单和分步式危机应对指南，未雨绸缪' },
+  'project-hub': { en: 'Project Management Hub', zh: '项目管理工作台', enDesc: 'Kanban-style project management with task lists, priority labels, due dates, progress tracking, and productivity reports — all local', zhDesc: '看板式项目管理，支持任务列表、优先级标签、截止日期、进度追踪和生产力报告，所有数据本地存储' },
+  'car-sound': { en: 'Car Engine Sound Simulator', zh: '汽车声浪模拟器', enDesc: 'Browse and play engine sound profiles from supercars, muscle cars, JDM, classic, and electric vehicles with virtual throttle', zhDesc: '浏览并播放超跑、肌肉车、JDM、经典车和电动车的引擎声浪，虚拟油门模拟真实轰鸣' },
+  'screensaver-calligraphy': { en: 'Calligraphy Screensaver', zh: '书法艺术屏保', enDesc: 'Dynamic TV screensaver showcasing Chinese calligraphy masterpieces with smooth transitions and clock overlay', zhDesc: '动态电视屏保，展示历代书法名家名作，平滑过渡切换，支持时钟叠加，适配多种电视尺寸' },
+  'screensaver-art': { en: 'Art Gallery Screensaver', zh: '唯美艺术屏保', enDesc: 'Curated art gallery screensaver featuring world-famous paintings with Ken Burns transitions and clock overlay', zhDesc: '精选世界名画屏保，从文艺复兴到印象派，Ken Burns 缩放平移过渡，适配 4K 大屏' },
+  'screensaver-landscape': { en: 'Landscape Screensaver', zh: '风景如画屏保', enDesc: 'Breathtaking nature landscape screensaver with mountains, oceans, forests, deserts and waterfalls in 4K', zhDesc: '震撼自然风光屏保，涵盖山川、海洋、森林、沙漠和瀑布，4K 画质，自动亮度调节' },
+  'screensaver-anime': { en: 'Anime World Screensaver', zh: '动漫世界屏保', enDesc: 'Vibrant anime scenery screensaver featuring Studio Ghibli and Makoto Shinkai inspired landscapes', zhDesc: '动漫主题屏保，宫崎骏与新海诚风格场景，柔和溶解过渡，全年龄友好' },
+  'screensaver-funny': { en: 'Funny Vibes Screensaver', zh: '搞笑趣图屏保', enDesc: 'Wholesome memes, funny animal photos, clever puns and humorous comics — family-friendly and copyright-free', zhDesc: '温馨搞笑屏保，萌宠趣图、机智段子、幽默漫画，全年龄友好、无版权问题' },
+  'level-runner': { en: 'Level Runner Challenge', zh: '闯关大挑战', enDesc: '10 increasingly difficult reaction game levels — Level 1 is easy, Level 10 (The Wall) is brutally hard. Beat them all!', zhDesc: '10 关难度递增的反应力游戏，第 1 关轻松上手，第 10 关（绝望之墙）难到崩溃，你能通关吗？' },
+  'puzzle-master': { en: 'Puzzle Maze Master', zh: '益智数字迷宫', enDesc: '20 levels of brain-teasing puzzles from simple pattern matching to brutal combinatorial challenges with star ratings', zhDesc: '20 关烧脑解谜，从简单图形匹配到地狱级组合谜题，三星评级让你反复挑战' },
+  'daily-ledger': { en: 'Daily Expense Ledger', zh: '每日记账本', enDesc: 'Categorized expense tracking with monthly budgets, pie charts, trend lines, and CSV export — all stored locally', zhDesc: '分类记账，每月预算可视进度条、饼图和趋势图分析，支持 CSV 导出，数据本地存储' },
+  'habit-forge': { en: 'Habit Forge', zh: '习惯锻造机', enDesc: 'Build daily habits with streak tracking, strength meter, weekly charts, and morning/evening routine templates', zhDesc: '养成每日好习惯，连续打卡日历、习惯强度表、每周完成率图表，还能一键套用早晚例程模板' },
+  'water-reminder': { en: 'Water Reminder', zh: '喝水小助手', enDesc: 'Hydration tracker with daily goal, smart interval reminders, progress ring, and weekly trend charts', zhDesc: '每日饮水追踪，智能间隔提醒，进度圆环动画，周趋势图，帮你养成喝水好习惯' },
+  'weight-tracker': { en: 'Weight Tracker', zh: '体重管理师', enDesc: 'Weight, BMI, and body fat tracking with trend charts, goal setting, and milestone celebrations', zhDesc: '体重、BMI、体脂率追踪，平滑趋势图，目标设定与里程碑庆祝，长期管理身材' },
+  'reading-list': { en: 'Reading List', zh: '阅读清单', enDesc: 'Book tracking with categories, reading progress, ratings, notes, yearly reading goals, and stats dashboard', zhDesc: '书籍管理，分类/进度/评分/笔记，年度阅读目标，统计面板，培养阅读习惯' },
+  'workout-log': { en: 'Workout Log', zh: '健身记录', enDesc: 'Log exercises with sets, reps, weight, and duration. Track progressive overload with charts and workout templates', zhDesc: '记录每组训练（动作/组数/次数/重量），渐进超负荷图表，训练模板，健身人士必备' },
+  'sleep-tracker': { en: 'Sleep Tracker', zh: '睡眠记录', enDesc: 'Log bedtime and wake time, track sleep quality, consistency, and debt with trend charts and reminders', zhDesc: '记录入睡/起床时间，追踪睡眠质量、作息规律性和睡眠负债，趋势图表助你改善睡眠' },
+  'personal-journal': { en: 'Personal Journal', zh: '个人日记', enDesc: 'Private daily journal with mood tracking, calendar heatmap, search, and yearly summary for self-reflection', zhDesc: '私密日记，心情选择、日历热力图、历史搜索、年度总结，记录每一天的成长' }
+};
+function seedName(a) { const s = SEED_LOC[a.id]; if (!s) return a.name; return currentLang === 'zh-CN' ? s.zh : s.en; }
+function seedDesc(a) { const s = SEED_LOC[a.id]; if (!s) return a.description; return currentLang === 'zh-CN' ? s.zhDesc : s.enDesc; }
+// Normalize legacy (pre-i18n) platform names stored in old databases to the current English values.
+const PLAT_MAP = { '网页': 'Web', '手机': 'Mobile', '电脑': 'Desktop', '笔记本': 'Laptop', '平板': 'Tablet', '车机': 'Car', '电视盒': 'TV Box', '鸿蒙': 'HarmonyOS' };
+function normPlat(p) { return PLAT_MAP[p] || p; }
+function t(key, vars) {
+  let s = currentLang === 'zh-CN' ? (I18N_ZH[key] || key) : key;
+  if (vars) for (const k in vars) s = s.split('{{' + k + '}}').join(vars[k]);
+  return s;
+}
+
+const APP_CATEGORIES = [
+  ['tool', 'Utilities'], ['office', 'Office'], ['entertainment', 'Entertainment'],
+  ['game', 'Games'], ['family', 'Family & Kids'], ['life', 'Life & Health'],
+  ['industry', 'Industry'], ['other', 'Other']
+];
+const CAT_NAMES = Object.fromEntries(APP_CATEGORIES);
+// Categories requiring manual review (tool/office auto-approve)
+const CAT_REVIEW = ['entertainment', 'game', 'family', 'life', 'industry', 'other'];
+
+function populateCategorySelects() {
+  const g = $('genCategory'), p = $('pubCategory');
+  const opts = APP_CATEGORIES.map(([k, label]) => `<option value="${k}">${t(label)}</option>`).join('');
+  if (g) g.insertAdjacentHTML('beforeend', opts);
+  if (p) p.innerHTML = opts;
+}
+
+function onCategoryAuto() {
+  const cat = $('genCategory').value;
+  const hint = $('genCatHint');
+  if (!hint) return;
+  if (!cat) { hint.textContent = t('Category auto-derived from template'); return; }
+  hint.textContent = CAT_REVIEW.includes(cat)
+    ? t('This category requires manual review; it enters the review queue after publishing')
+    : t('Tool / office categories auto-approve; publish directly after generation');
+}
+
+function catLabel(c) {
+  return t(CAT_NAMES[c] || 'Other');
+}
+
+const $ = id => document.getElementById(id);
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s ?? '');
+  return d.innerHTML;
+}
+
+function appShareBadge(a) {
+  if (a.share === 'public') return '<span class="share-badge pub">' + t('🌐 Public') + '</span>';
+  if (a.share === 'org') return '<span class="share-badge org">' + t('🏢 Org') + '</span>';
+  return '<span class="share-badge">' + t('🔒 Private') + '</span>';
+}
+
+// ====== State ======
+let currentAdminPanel = 'stats'; // current admin sub-panel
+let adminUsers = [];
+let adminApps = [];
+let adminStats = null;
+let authMode = 'login';
+let adminAppSearch = '';
+let adminAppCatFilter = '';
+let adminUserSearch = '';
+
+
+// ====== Admin system ======
+const STATUS_LABEL = {
+  published: 'Published', reviewing: 'Under Review', draft: 'Draft', disabled: 'Disabled'
+};
+
+function admStatusBadge(status) {
+  return `<span class="a-badge ${status}">${t(STATUS_LABEL[status] || status)}</span>`;
+}
+
+function setAdminPanel(panel) {
+  currentAdminPanel = panel;
+  document.querySelectorAll('.admin-menu-item').forEach(b =>
+    b.classList.toggle('on', b.dataset.panel === panel));
+  ['stats', 'apps', 'users', 'prompt'].forEach(p =>
+    $('panel' + (p === 'stats' ? 'Stats' : p[0].toUpperCase() + p.slice(1))).hidden = p !== panel);
+  loadAdminPanel(panel);
+}
+
+function loadAdminPanel(panel) {
+  if (panel === 'stats') loadAdminStats();
+  else if (panel === 'apps') loadAdminApps();
+  else if (panel === 'users') loadAdminUsers();
+  else if (panel === 'prompt') loadAdminPrompt();
+}
+
+// --- Usage stats ---
+async function loadAdminStats() {
+  const el = $('panelStats');
+  if (el) el.innerHTML = `<div class="admin-card"><div class="loading-hint">${t('Loading…')}</div></div>`;
+  const res = await fetch('/api/admin/stats');
+  const d = await res.json();
+  adminStats = d;
+  renderAdminStats(d);
+}
+
+function renderAdminStats(d) {
+  const el = $('panelStats');
+  const userRows = (d.users || []).map(u => `
+    <tr>
+      <td>${esc(u.name)}</td>
+      <td>${u.role === 'admin' ? '<span class="a-badge admin">' + t('Admin') + '</span>' : t('User')}</td>
+      <td>${u.status === 'active' ? '<span class="a-badge active">' + t('Active') + '</span>' : '<span class="a-badge disabled">' + t('Disabled') + '</span>'}</td>
+      <td>${u.apps_generated}</td>
+      <td>${u.launches}</td>
+      <td>${u.incentive}</td>
+    </tr>`).join('');
+  const topApps = (d.top_apps || []).map((a, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${esc(a.name)}</td>
+      <td>${esc(appOwnerName(a.owner))}</td>
+      <td>${admStatusBadge(a.status)}</td>
+      <td>${a.launches}</td>
+    </tr>`).join('');
+  // Category distribution chart
+  const catCounts = {};
+  (d.top_apps || []).forEach(a => { catCounts[a.category] = (catCounts[a.category] || 0) + 1; });
+  // Use all apps from adminApps for full category distribution
+  adminApps.forEach(a => { catCounts[a.category] = (catCounts[a.category] || 0) + 1; });
+  const totalForCat = Object.values(catCounts).reduce((s, v) => s + v, 0) || 1;
+  const catColors = { tool: '#d97757', office: '#788c5d', entertainment: '#b89a45', game: '#9b6bbf', family: '#e87b5a', life: '#5b9aa0', industry: '#6f6d64', other: '#a8a39b' };
+  const catBars = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).map(([cat, count]) => {
+    const pct = (count / totalForCat * 100).toFixed(1);
+    const color = catColors[cat] || '#a8a39b';
+    return `<div class="cat-bar-wrap">
+      <span class="cat-bar-label">${t(CAT_NAMES[cat] || 'Other')}</span>
+      <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="cat-bar-num">${count}</span>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="admin-card">
+      <h3>${t('📊 Platform Overview')}</h3>
+      <div class="sub">${t('Overview of app usage, providing data for future operations such as user incentives and ad revenue share')}</div>
+      <div class="stat-row">
+        <div class="stat-card"><div class="num">${d.total_apps}</div><div class="lbl">${t('Total Apps')}</div></div>
+        <div class="stat-card"><div class="num">${d.published}</div><div class="lbl">${t('Published')}</div></div>
+        <div class="stat-card"><div class="num">${d.reviewing}</div><div class="lbl">${t('Under Review')}</div></div>
+        <div class="stat-card"><div class="num">${d.disabled}</div><div class="lbl">${t('Disabled')}</div></div>
+        <div class="stat-card"><div class="num">${d.total_launches}</div><div class="lbl">${t('Total Launches')}</div></div>
+        <div class="stat-card"><div class="num">${d.total_users}</div><div class="lbl">${t('Registered Users')}</div></div>
+        <div class="stat-card"><div class="num">${d.active_users}</div><div class="lbl">${t('Active Users')}</div></div>
+        <div class="stat-card"><div class="num">${d.total_incentive}</div><div class="lbl">${t('Incentives Issued')}</div></div>
+      </div>
+    </div>
+    ${catBars ? `<div class="admin-card">
+      <h3>${t('📈 Category Distribution')}</h3>
+      <div class="sub">${t('App counts by category')}</div>
+      <div class="admin-cat-chart">${catBars}</div>
+    </div>` : ''}
+    <div class="admin-card">
+      <h3>${t('🏆 Top Popular Apps')}</h3>
+      <div class="sub">${t('Sorted by launch count')}</div>
+      <table class="admin-table">
+        <thead><tr><th>#</th><th>${t('App')}</th><th>${t('Owner')}</th><th>${t('Status')}</th><th>${t('Launches')}</th></tr></thead>
+        <tbody>${topApps || '<tr><td colspan="5">' + t('No data') + '</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div class="admin-card">
+      <h3>${t('👥 User Contribution')}</h3>
+      <div class="sub">${t('Generated apps and launches (incentive is placeholder data for a future incentive plan)')}</div>
+      <table class="admin-table">
+        <thead><tr><th>${t('User')}</th><th>${t('Role')}</th><th>${t('Status')}</th><th>${t('Generated')}</th><th>${t('Launches')}</th><th>${t('Incentive')}</th></tr></thead>
+        <tbody>${userRows || '<tr><td colspan="6">' + t('No data') + '</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+function appOwnerName(owner) {
+  if (owner === 'me') return t('Me');
+  const u = adminUsers.find(x => x.id === owner);
+  return u ? u.name : owner;
+}
+
+// --- App management ---
+async function loadAdminApps() {
+  const el = $('panelApps');
+  if (el) el.innerHTML = `<div class="admin-card"><div class="loading-hint">${t('Loading…')}</div></div>`;
+  const res = await fetch('/api/admin/apps');
+  const d = await res.json();
+  adminApps = d.apps || [];
+  renderAdminApps();
+}
+
+function getFilteredApps() {
+  let list = adminApps;
+  if (currentAdminFilter !== 'all') list = list.filter(a => a.status === currentAdminFilter);
+  if (adminAppCatFilter) list = list.filter(a => a.category === adminAppCatFilter);
+  if (adminAppSearch) {
+    const q = adminAppSearch.toLowerCase();
+    list = list.filter(a => a.name.toLowerCase().includes(q) || (a.description || '').toLowerCase().includes(q)
+      || (a.tags || []).some(t => t.toLowerCase().includes(q)));
+  }
+  return list;
+}
+
+function renderAdminApps() {
+  const el = $('panelApps');
+  const filtered = getFilteredApps();
+  const rows = filtered.map(a => {
+    const tags = (a.tags || []).map(t => `<span class="app-tag">${t}</span>`).join('');
+    const plat = (a.platforms || []).map(p => `<span class="plat-badge">${p}</span>`).join(' ');
+    let actions = '';
+    if (a.status === 'reviewing') {
+      actions = `<button class="small-btn ok" onclick="adminReview('${a.id}','approve')">${t('✅ Approve')}</button>
+                 <button class="small-btn danger" onclick="adminReview('${a.id}','reject')">${t('⛔ Reject')}</button>`;
+    }
+    if (a.status === 'published') {
+      actions = `<button class="small-btn warn" onclick="adminStatus('${a.id}','disable')">${t('🛑 Disable')}</button>
+                 <button class="small-btn" onclick="adminEditApp('${a.id}')">${t('✏️ Edit')}</button>
+                 <button class="small-btn danger" onclick="adminDelete('${a.id}')">${t('🗑 Delete')}</button>`;
+    } else if (a.status === 'disabled') {
+      actions = `<button class="small-btn ok" onclick="adminStatus('${a.id}','enable')">${t('▶ Restore')}</button>
+                 <button class="small-btn" onclick="adminEditApp('${a.id}')">${t('✏️ Edit')}</button>`;
+    } else if (a.status === 'draft') {
+      actions = `<button class="small-btn ok" onclick="adminStatus('${a.id}','publish')">${t('🚀 Publish')}</button>
+                 <button class="small-btn" onclick="adminEditApp('${a.id}')">${t('✏️ Edit')}</button>
+                 <button class="small-btn danger" onclick="adminDelete('${a.id}')">${t('🗑 Delete')}</button>`;
+    }
+    return `<tr>
+      <td><b>${esc(a.name)}</b><br><span class="a-note">${esc(appOwnerName(a.owner))}</span></td>
+      <td>${admStatusBadge(a.status)}<br><span class="a-note">v${a.version}</span></td>
+      <td><span class="cat-badge">${catLabel(a.category)}</span> ${appShareBadge(a)}<br><span class="a-note">${tags || '—'}</span></td>
+      <td>${plat || '<span class="a-note">—</span>'}</td>
+      <td>${a.launches}</td>
+      <td class="a-note">${a.report ? '🚩 ' + esc(a.report) : '—'}</td>
+      <td class="a-note">${esc(a.review_note) || '—'}</td>
+      <td><div class="admin-actions">${actions}</div></td>
+    </tr>`;
+  }).join('');
+  const catOptions = APP_CATEGORIES.map(([k, label]) =>
+    `<option value="${k}" ${adminAppCatFilter === k ? 'selected' : ''}>${t(label)}</option>`).join('');
+  el.innerHTML = `
+    <div class="admin-card">
+      <h3>${t('📦 App Management')}</h3>
+      <div class="sub">${t('Review, publish, disable, edit and take down apps. Newly published apps enter "Under Review" and only become public on the market after approval')}</div>
+      <div class="admin-toolbar">
+        <input class="admin-search" type="text" placeholder="${t('Search apps…')}" value="${esc(adminAppSearch)}" oninput="onAdminAppSearch(this.value)" />
+        <select class="admin-select" onchange="onAdminAppCatFilter(this.value)">
+          <option value="">${t('All Categories')}</option>
+          ${catOptions}
+        </select>
+      </div>
+      <div class="admin-actions" style="margin-bottom:12px">
+        <button class="small-btn ${currentAdminFilter==='all'?'on':''}" onclick="setAdminAppFilter('all')">${t('All')}</button>
+        <button class="small-btn ${currentAdminFilter==='reviewing'?'on':''}" onclick="setAdminAppFilter('reviewing')">${t('Under Review')}</button>
+        <button class="small-btn ok ${currentAdminFilter==='published'?'on':''}" onclick="setAdminAppFilter('published')">${t('Published')}</button>
+        <button class="small-btn warn ${currentAdminFilter==='draft'?'on':''}" onclick="setAdminAppFilter('draft')">${t('Draft')}</button>
+        <button class="small-btn danger ${currentAdminFilter==='disabled'?'on':''}" onclick="setAdminAppFilter('disabled')">${t('Disabled')}</button>
+        <span class="a-note" style="margin-left:auto">${filtered.length}/${adminApps.length}</span>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>${t('App')}</th><th>${t('Status')}</th><th>${t('Tags')}</th><th>${t('Platforms')}</th><th>${t('Launches')}</th><th>${t('Reports')}</th><th>${t('Review Note')}</th><th>${t('Actions')}</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="8">' + t('No data') + '</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+let currentAdminFilter = 'all';
+function onAdminAppSearch(v) { adminAppSearch = v; renderAdminApps(); }
+function onAdminAppCatFilter(v) { adminAppCatFilter = v; renderAdminApps(); }
+
+async function setAdminAppFilter(f) {
+  currentAdminFilter = f;
+  renderAdminApps();
+}
+
+async function adminReview(id, action) {
+  const note = action === 'reject'
+    ? (prompt(t('Please enter the rejection reason:'), '') ?? '') : '';
+  const res = await fetch('/api/admin/app/review', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, action, note })
+  });
+  const d = await res.json();
+  if (!d.ok) { alert(d.error || t('Operation failed')); return; }
+  await loadAdminApps();
+}
+
+async function adminStatus(id, action) {
+  const res = await fetch('/api/admin/app/status', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, action })
+  });
+  const d = await res.json();
+  if (!d.ok) { alert(d.error || 'Operation failed'); return; }
+  await loadAdminApps();
+}
+
+async function adminEditApp(id) {
+  const a = adminApps.find(x => x.id === id);
+  if (!a) return;
+  $('editAppId').value = a.id;
+  $('editName').value = a.name || '';
+  $('editDesc').value = a.description || '';
+  $('editTags').value = (a.tags || []).join(', ');
+  $('editPlatforms').value = (a.platforms || []).join(', ');
+  $('editModal').classList.add('show');
+}
+
+function closeEditModal() {
+  $('editModal').classList.remove('show');
+}
+
+async function submitEditApp() {
+  const id = $('editAppId').value;
+  const name = $('editName').value.trim();
+  const desc = $('editDesc').value.trim();
+  const tags = $('editTags').value;
+  const platforms = $('editPlatforms').value;
+  const res = await fetch('/api/admin/app/edit', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id, name,
+      description: desc,
+      tags: tags.split(/[,，]/).map(s => s.trim()).filter(Boolean),
+      platforms: platforms.split(/[,，]/).map(s => s.trim()).filter(Boolean)
+    })
+  });
+  const d = await res.json();
+  if (!d.ok) { alert(d.error || t('Edit failed')); return; }
+  closeEditModal();
+  await loadAdminApps();
+}
+
+async function adminDelete(id) {
+  if (!confirm(t('Delete this app? This cannot be undone.'))) return;
+  const res = await fetch('/api/admin/app/delete', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  });
+  const d = await res.json();
+  if (!d.ok) { alert(d.error || t('Delete failed')); return; }
+  await loadAdminApps();
+}
+
+// --- User management ---
+async function loadAdminUsers() {
+  const el = $('panelUsers');
+  if (el) el.innerHTML = `<div class="admin-card"><div class="loading-hint">${t('Loading…')}</div></div>`;
+  const res = await fetch('/api/admin/users');
+  const d = await res.json();
+  adminUsers = d.users || [];
+  renderAdminUsers();
+}
+
+function renderAdminUsers() {
+  const el = $('panelUsers');
+  let filtered = adminUsers;
+  if (adminUserSearch) {
+    const q = adminUserSearch.toLowerCase();
+    filtered = filtered.filter(u => u.name.toLowerCase().includes(q) || u.id.toLowerCase().includes(q));
+  }
+  const rows = filtered.map(u => `
+    <tr>
+      <td><b>${esc(u.name)}</b><br><span class="a-note">${esc(u.id)}</span></td>
+      <td>${u.role === 'admin' ? '<span class="a-badge admin">' + t('Admin') + '</span>' : '<span class="a-badge">' + t('User') + '</span>'}</td>
+      <td>${u.status === 'active' ? '<span class="a-badge active">' + t('Active') + '</span>' : '<span class="a-badge disabled">' + t('Disabled') + '</span>'}</td>
+      <td>${u.apps_generated}</td>
+      <td>${u.launches}</td>
+      <td>${u.incentive}</td>
+      <td>
+        ${u.role !== 'admin' ? (u.status === 'active'
+          ? '<button class="small-btn warn" onclick="adminToggleUser(\'' + u.id + '\',\'disable\')">' + t('🛑 Disable') + '</button>'
+          : '<button class="small-btn ok" onclick="adminToggleUser(\'' + u.id + '\',\'enable\')">' + t('▶ Enable') + '</button>')
+          : '<span class="a-note">—</span>'}
+      </td>
+    </tr>`).join('');
+  el.innerHTML = `
+    <div class="admin-card">
+      <h3>${t('👥 User Management')}</h3>
+      <div class="sub">${t('Manage platform users; enable / disable accounts (single-user prototype with preset sample users)')}</div>
+      <div class="admin-toolbar">
+        <input class="admin-search" type="text" placeholder="${t('Search users…')}" value="${esc(adminUserSearch)}" oninput="onAdminUserSearch(this.value)" />
+        <span class="a-note">${filtered.length}/${adminUsers.length}</span>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>${t('User')}</th><th>${t('Role')}</th><th>${t('Status')}</th><th>${t('Generated')}</th><th>${t('Launches')}</th><th>${t('Incentive')}</th><th>${t('Actions')}</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="7">' + t('No data') + '</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+function onAdminUserSearch(v) { adminUserSearch = v; renderAdminUsers(); }
+
+async function adminToggleUser(id, action) {
+  const res = await fetch('/api/admin/user/toggle', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, action })
+  });
+  const d = await res.json();
+  if (!d.ok) { alert(d.error || t('Operation failed')); return; }
+  loadAdminUsers();
+}
+
+// --- Prompt iteration ---
+async function loadAdminPrompt() {
+  const res = await fetch('/api/admin/prompt');
+  const d = await res.json();
+  if (!d.ok) return;
+  const el = $('panelPrompt');
+  el.innerHTML = `
+    <div class="admin-card">
+      <h3>${t('🤖 Generation Skill Prompt')}</h3>
+      <div class="sub">${t('The text is maintained independently with versioning and structured sections for continuous online iteration; changes take effect immediately for subsequent generations after saving')}</div>
+      <div class="prompt-meta">
+        <span class="a-badge review">${t('Version {{v}}', {v: esc(d.version)})}</span>
+        <button class="small-btn" onclick="resetAdminPrompt()">${t('↺ Restore Built-in Default')}</button>
+      </div>
+      <textarea class="prompt-box" id="promptBox">${esc(d.prompt)}</textarea>
+      <div style="margin-top:12px;text-align:right">
+        <button class="m-btn primary" onclick="saveAdminPrompt()">${t('💾 Save & Apply')}</button>
+      </div>
+    </div>`;
+}
+
+async function saveAdminPrompt() {
+  const content = $('promptBox').value;
+  const res = await fetch('/api/admin/prompt', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: content })
+  });
+  const d = await res.json();
+  if (!d.ok) { alert(d.error || t('Save failed')); return; }
+  alert(t('Saved and applied; future generations will use the latest prompt.'));
+}
+
+async function resetAdminPrompt() {
+  if (!confirm(t('Restore the built-in default prompt? Your current edits will be overwritten.'))) return;
+  const res = await fetch('/api/admin/prompt/reset', { method: 'POST' });
+  const d = await res.json();
+  if (!d.ok) { alert(d.error || t('Restore failed')); return; }
+  $('promptBox').value = d.prompt;
+  alert(t('Built-in default prompt restored. Click "Save & Apply" to make it take effect.'));
+}
+
+
+
+// ====== Admin auth (separate admin site) ======
+let currentUser = null;     // { id, name, role } or null
+
+async function loadSession() {
+  try {
+    const res = await fetch('/api/auth/me');
+    const d = await res.json();
+    if (d.ok && d.user && d.user.role === 'admin') currentUser = d.user;
+  } catch (e) { /* not logged in */ }
+  renderAuthUI();
+  if (currentUser) { setAdminPanel(currentAdminPanel); }
+  else { openLogin(); }
+}
+
+function renderAuthUI() {
+  const el = document.getElementById('authArea');
+  if (!el) return;
+  if (currentUser) {
+    const admin = currentUser.role === 'admin' ? ' <span class="role-badge">' + t('Admin') + '</span>' : '';
+    el.innerHTML = `<span class="user-chip"><span class="uname">${esc(currentUser.name)}</span>${admin}<button onclick="logout()">${t('Log out')}</button></span>`;
+  } else {
+    el.innerHTML = `<button class="login-btn" onclick="openLogin()">${t('Log in / Register')}</button>`;
+  }
+}
+
+async function logout() {
+  currentUser = null;
+  renderAuthUI();
+  openLogin();
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  const submit = document.getElementById('authSubmitBtn');
+  if (submit) submit.textContent = mode === 'register' ? t('Register & Log in') : t('Log in');
+}
+
+function openLogin() {
+  setAuthMode('login');
+  const modal = document.getElementById('authModal');
+  if (modal) modal.classList.add('show');
+  const u = document.getElementById('authUser');
+  if (u) u.focus();
+}
+function closeAuth() {
+  const modal = document.getElementById('authModal');
+  if (modal) modal.classList.remove('show');
+}
+
+async function authSubmit() {
+  const username = document.getElementById('authUser').value.trim();
+  const password = document.getElementById('authPass').value;
+  const msg = document.getElementById('authMsg');
+  if (!username) { msg.className = 'auth-msg err'; msg.textContent = t('Please enter a username'); return; }
+  if (!password) { msg.className = 'auth-msg err'; msg.textContent = t('Please enter a password'); return; }
+  if (password.length < 6) { msg.className = 'auth-msg err'; msg.textContent = t('Password must be at least 6 characters'); return; }
+  msg.className = 'auth-msg'; msg.textContent = t('Processing…');
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const d = await res.json();
+    if (!d.ok) { msg.className = 'auth-msg err'; msg.textContent = d.error || t('Operation failed'); return; }
+    if (d.user.role !== 'admin') {
+      msg.className = 'auth-msg err'; msg.textContent = t('Admin permission required'); return;
+    }
+    currentUser = d.user;
+    msg.className = 'auth-msg ok'; msg.textContent = t('Success, entering…');
+    renderAuthUI();
+    closeAuth();
+    setAdminPanel(currentAdminPanel);
+  } catch (e) {
+    msg.className = 'auth-msg err'; msg.textContent = t('Network error: {{msg}}', {msg: e.message});
+  }
+}
+
+// ====== Admin i18n glue (separate site) ======
+function setLang(l) {
+  if (!SUPPORTED_LANGS.includes(l)) return;
+  currentLang = l;
+  localStorage.setItem('aiapp_lang', l);
+  document.documentElement.lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === l));
+  applyStaticI18n();
+  if (currentUser) loadAdminPanel(currentAdminPanel);
+  renderAuthUI();
+}
+function applyStaticI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+  document.querySelectorAll('[data-i18n-t]').forEach(el => { el.title = t(el.getAttribute('data-i18n-t')); });
+}
+
+// ====== Initialization ======
+(async function init() {
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === currentLang));
+  applyStaticI18n();
+  document.querySelectorAll('.admin-menu-item').forEach(b =>
+    b.onclick = () => { setAdminPanel(b.dataset.panel); });
+  await loadSession();
+  // Close edit modal on overlay click / Escape
+  $('editModal').addEventListener('click', e => { if (e.target.id === 'editModal') closeEditModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditModal(); });
+})();
+
+</script>
+</body>
+</html>

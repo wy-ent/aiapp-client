@@ -1,0 +1,2905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aiapp-mb · AI-native cross-platform app market</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf9f5;            /* Light warm-beige background */
+    --panel: #ffffff;
+    --panel-2: #f1efe7;       /* Secondary warm panel */
+    --border: #e3dfd3;        /* Light Gray */
+    --text: #141413;          /* Dark charcoal text */
+    --muted: #6f6d64;         /* Secondary text */
+    --accent: #d97757;        /* Orange primary accent */
+    --accent-2: #a8553a;      /* Dark orange: accent text/hover */
+    --ok: #788c5d;            /* Green */
+    --err: #b3412c;
+    --tag-bg: #f3f0e8;
+    --tag-border: #ded9ca;
+    --overlay: rgba(20,20,19,0.55);
+    --font-head: "Poppins", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-body: "Lora", Georgia, "PingFang SC", "Microsoft YaHei", serif;
+    --shadow: 0 10px 30px rgba(20,20,19,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Headings uniformly use the brand heading font Poppins */
+  .mode-btn, .sec-title, .win-name, .modal h3, .auth-tab,
+  .admin-card h3, .stat-card .num, .tv-title, .mem-done, .app-mini-card h3,
+  .gen-toggle, .gen-submit, .custom-gen, .login-btn, .m-btn.primary, .sm-tile-name {
+    font-family: var(--font-head);
+  }
+
+  /* ===== Bottom navigation bar (full width, like a desktop taskbar) ===== */
+  .dock {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 120;
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 20px; background: var(--panel);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 20px rgba(20,20,19,.06);
+  }
+  .dock .start-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 42px; height: 42px; border: none; border-radius: 12px;
+    background: linear-gradient(135deg, #d97757, #a8553a);
+    font-size: 20px; cursor: pointer; color: #fff; flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(217,119,87,.35); transition: all .15s;
+  }
+  .dock .start-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .dock .nav-tasks { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+  .dock .dock-task {
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border: none; border-radius: 8px;
+    background: transparent; font-size: 18px; cursor: pointer;
+    color: var(--muted); transition: all .15s; position: relative;
+  }
+  .dock .dock-task:hover { background: var(--panel-2); color: var(--text); }
+  .dock .dock-task.on { background: var(--panel-2); }
+  .dock .dock-task.on::after {
+    content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+  .dock-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .bb-tasks { display: flex; gap: 6px; align-items: center; overflow-x: auto; flex: 1; min-width: 0; padding: 0 4px; }
+  .bb-tasks::-webkit-scrollbar { height: 2px; }
+  .bb-tasks::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .bb-tasks .task-label { font-size: 11px; color: var(--muted); margin-right: 2px; flex-shrink: 0; }
+  .bb-tasks .task-empty { font-size: 12px; color: #b9b5a9; flex-shrink: 0; }
+  .bb-tasks .task-icon {
+    display: flex; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0;
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 5px 5px; cursor: pointer;
+    width: 32px; height: 32px; font-size: 16px; transition: all .15s; position: relative;
+  }
+  .bb-tasks .task-icon:hover { border-color: var(--accent); }
+  .bb-tasks .task-icon.on { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .bb-tasks .task-icon.on .task-close { color: #fff; }
+  .bb-tasks .task-icon .task-close {
+    display: none; position: absolute; top: -4px; right: -4px;
+    font-size: 10px; width: 14px; height: 14px; line-height: 14px;
+    text-align: center; border-radius: 50%; background: var(--err); color: #fff;
+  }
+  .bb-tasks .task-icon:hover .task-close { display: flex; align-items: center; justify-content: center; }
+  .lang-btn {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 10px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .lang-btn:hover { color: var(--text); }
+  .lang-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  /* Start menu */
+  .start-menu {
+    position: fixed; bottom: 66px; left: 50%; transform: translateX(-50%);
+    width: 320px; max-width: 92vw; z-index: 125;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 18px; padding: 10px;
+    box-shadow: 0 24px 70px rgba(20,20,19,.28);
+    animation: smIn .16s ease;
+  }
+  @keyframes smIn { from { transform: translateX(-50%) translateY(8px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  .start-menu .sm-stats { font-size: 11px; color: var(--muted); padding: 4px 10px 8px; }
+  .start-menu .sm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 4px; }
+  .start-menu .sm-tile {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    background: transparent; border: none; border-radius: 14px;
+    padding: 12px 4px 10px; cursor: pointer; transition: background .12s;
+  }
+  .start-menu .sm-tile:hover { background: var(--panel-2); }
+  .start-menu .sm-tile .sm-tile-ico {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: #fff;
+    box-shadow: 0 3px 10px rgba(20,20,19,.15); transition: transform .12s;
+  }
+  .start-menu .sm-tile:hover .sm-tile-ico { transform: translateY(-2px); }
+  .start-menu .sm-tile .sm-tile-name { font-size: 12px; color: var(--text); }
+  .start-menu .sm-tile.on .sm-tile-ico { outline: 3px solid var(--accent); }
+  .start-menu .sm-divider { height: 1px; background: var(--border); margin: 6px 8px; }
+  .start-menu .sm-lang { display: flex; gap: 6px; padding: 6px 10px; }
+  /* Lightweight toast */
+  .toast {
+    position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(10px);
+    background: rgba(20,20,19,.85); color: #fff; font-size: 13px;
+    padding: 10px 22px; border-radius: 999px; z-index: 300;
+    opacity: 0; pointer-events: none; transition: all .25s; max-width: 80vw; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  /* Standalone app page (/p/:id): app content only, no platform shell */
+  body.standalone { padding-bottom: 0; }
+  #standaloneRoot { max-width: 720px; margin: 0 auto; padding: 36px 20px 80px; }
+  .standalone-brand {
+    position: fixed; bottom: 0; left: 0; right: 0; text-align: center;
+    padding: 10px; font-size: 12px; color: var(--muted);
+    background: var(--panel); border-top: 1px solid var(--border);
+  }
+  .standalone-brand a { color: var(--accent-2); text-decoration: none; }
+  .standalone-brand a:hover { text-decoration: underline; }
+
+  /* ===== Generator (rendered inside the generator app window) ===== */
+  .gen-window-body { padding: 20px 24px; }
+  .gen-drawer {
+    background: var(--panel); padding: 20px 24px;
+  }
+  .gen-drawer .mode-switch { display: flex; gap: 6px; margin-bottom: 12px; }
+  .gen-drawer .mode-btn {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 16px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .gen-drawer .mode-btn:hover { color: var(--text); }
+  .gen-drawer .mode-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .gen-drawer .update-target {
+    display: flex; gap: 10px; align-items: center; margin-bottom: 12px;
+    padding: 10px 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .gen-drawer .update-target select {
+    flex: 1; background: var(--panel); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px; font-size: 13px; outline: none;
+  }
+  .gen-drawer textarea {
+    width: 100%; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; font-family: inherit;
+    outline: none; min-height: 70px; resize: vertical;
+  }
+  .gen-drawer textarea:focus { border-color: var(--accent); }
+  .gen-drawer .gen-row {
+    display: flex; gap: 12px; align-items: center; margin-top: 12px; flex-wrap: wrap;
+  }
+  .gen-drawer .tpl-mini { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tpl-mini-btn {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; font-size: 12px; color: var(--muted);
+    cursor: pointer; transition: all .15s;
+  }
+  .tpl-mini-btn:hover { border-color: var(--muted); }
+  .tpl-mini-btn.on { border-color: var(--accent); color: var(--accent-2); }
+  .gen-drawer .gen-submit {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 8px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+    margin-left: auto;
+  }
+  .gen-drawer .gen-submit:hover { background: var(--accent-2); }
+  .gen-drawer .gen-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .gen-drawer .gen-result { margin-top: 10px; font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .gen-result .res-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .gen-result .res-btn {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 14px; font-size: 12px; color: var(--text); cursor: pointer; transition: all .15s;
+  }
+  .gen-result .res-btn:hover { border-color: var(--accent); }
+  .gen-result .res-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ===== Home page ===== */
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 20px 20px 110px; }
+
+  .avail-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+  .avail-switch { display: flex; gap: 6px; align-items: center; }
+  .avail-btn {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 18px; font-size: 13px;
+    color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .avail-btn:hover { border-color: var(--muted); color: var(--text); }
+  .avail-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .avail-btn.on.warn { background: #fbf3e0; border-color: #8a6a1f; color: #8a6a1f; }
+  .current-device {
+    font-size: 12px; color: var(--muted); margin-left: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .current-device .dev-badge {
+    background: var(--tag-bg); color: var(--accent-2);
+    border: 1px solid var(--tag-border); border-radius: 4px; padding: 2px 8px;
+    font-size: 11px;
+  }
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .filter-bar .label { font-size: 12px; color: var(--muted); margin-right: 4px; }
+  .market-search {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .market-search input {
+    flex: 1; min-width: 0; padding: 8px 16px; border: 1.5px solid var(--border);
+    border-radius: 999px; background: var(--panel); font-size: 13px;
+    font-family: var(--font-body); color: var(--text); outline: none;
+    transition: border-color .15s;
+  }
+  .market-search input:focus { border-color: var(--accent); }
+  .market-search input::placeholder { color: #b0aca0; }
+  .market-search .clear-btn {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 16px; padding: 4px 8px; border-radius: 999px; transition: all .15s;
+  }
+  .market-search .clear-btn:hover { background: var(--panel-2); color: var(--text); }
+  .filter-chip {
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 4px 12px; font-size: 12px;
+    color: var(--muted); cursor: pointer; transition: all .15s;
+    user-select: none;
+  }
+  .filter-chip:hover { border-color: var(--muted); color: var(--text); }
+  .filter-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter-chip.tag { border-radius: 4px; }
+
+  .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 1100px) { .app-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 800px) { .app-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .app-grid { grid-template-columns: 1fr; } }
+  .app-card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; cursor: pointer;
+    box-shadow: 0 1px 2px rgba(20,20,19,0.04);
+    transition: border-color .15s, transform .1s, box-shadow .15s;
+  }
+  .app-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow); }
+  /* App-icon style tiles (name initial + stable random color); replaces the banner thumb */
+  .app-card .app-icon {
+    width: 52px; height: 52px; border-radius: 13px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 24px; font-weight: 700; font-family: var(--font-head);
+    box-shadow: 0 3px 10px rgba(20,20,19,.18); user-select: none;
+  }
+  .app-icon {
+    width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 14px; font-weight: 700; font-family: var(--font-head);
+    user-select: none; vertical-align: middle;
+  }
+  .app-card .app-head { display: flex; align-items: center; gap: 12px; }
+  .app-card .app-head .app-name { margin-bottom: 2px; }
+  .app-card .app-head .app-meta-line { margin-bottom: 0; }
+  .app-card .app-body { padding: 14px; }
+  .app-card .app-name { font-size: 15px; font-weight: 700; font-family: var(--font-head); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .app-card .app-name .not-sup { font-size: 13px; }
+  .vis-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px;
+  }
+  .vis-badge.private { background: #fbf3e0; color: #8a6a1f; border: 1px solid #e5d5a8; }
+  .vis-badge.public { background: #eef3e4; color: #5c7044; border: 1px solid #cdd8b4; }
+  .vis-badge.review { background: #eaf2fb; color: #3f6fa8; border: 1px solid #c3d8ef; }
+  .vis-badge.danger { background: #fbeaec; color: #a84654; border: 1px solid #edc8cd; }
+  .ver-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px;
+    background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+  }
+  /* Category / share badges */
+  .app-meta-line { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+  .cat-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px;
+    background: #f3efe9; color: #7a6a55; border: 1px solid #e0d7c8;
+  }
+  .share-badge {
+    font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 7px;
+    background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+  }
+  .share-badge.pub { background: #eef3e4; color: #5c7044; border: 1px solid #cdd8b4; }
+  .share-badge.org { background: #eaf2fb; color: #3f6fa8; border: 1px solid #c3d8ef; }
+  /* Generator category row */
+  .gen-drawer .cat-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .gen-drawer .gen-cat-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .gen-drawer .gen-cat-hint { font-size: 11px; color: var(--accent-2); }
+  .gen-drawer select {
+    flex: 1; min-width: 120px; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 7px; padding: 6px 8px; font-size: 13px;
+  }
+  /* Publish modal share scope */
+  .share-options { display: flex; gap: 8px; margin-top: 6px; }
+  .pub-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .pub-row select { flex: 1; min-width: 120px; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 7px; padding: 6px 8px; font-size: 13px; }
+  .pub-check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); cursor: pointer; }
+  .pub-check input { accent-color: var(--accent); }
+  .share-opt {
+    flex: 1; display: flex; align-items: flex-start; gap: 8px;
+    border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px;
+    cursor: pointer; background: var(--panel-2);
+  }
+  .share-opt b { font-size: 13px; display: block; }
+  .share-opt small { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; line-height: 1.4; }
+  .share-opt input { margin-top: 2px; accent-color: var(--accent); }
+  .app-card .app-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .app-card .app-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+  .app-tag {
+    font-size: 11px; background: var(--tag-bg); color: var(--accent-2);
+    border: 1px solid var(--tag-border); border-radius: 4px; padding: 2px 7px;
+  }
+  .app-card .app-platforms { display: flex; gap: 4px; flex-wrap: wrap; }
+  .plat-badge {
+    font-size: 11px; background: var(--panel-2); color: var(--muted);
+    border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px;
+  }
+  /* Online / local badge */
+  .app-card .app-net { display: flex; gap: 4px; margin-bottom: 10px; }
+  .net-badge {
+    font-size: 11px; font-weight: 600; border-radius: 4px; padding: 2px 7px;
+    border: 1px solid;
+  }
+  .net-badge.online { background: #eaf2fb; color: #3f6fa8; border-color: #c3d8ef; }
+  .net-badge.local  { background: #eef3e4; color: #5c7044; border-color: #cdd8b4; }
+  /* Instant-launch button */
+  .launch-btn {
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 10px;
+    background: var(--accent); border: 1px solid var(--accent); color: #fff;
+    border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .15s; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .launch-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .launch-btn.lg { width: 100%; justify-content: center; padding: 9px 14px; font-size: 14px; }
+
+  /* ===== Home: Bing-style entrance (launchpad) ===== */
+  .home-hero {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 64px 24px 20px; text-align: center;
+  }
+  .hero-logo {
+    font-size: 58px; font-weight: 800; font-family: var(--font-head);
+    background: linear-gradient(135deg, #d97757, #a8553a);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 12px; letter-spacing: 1px; line-height: 1.1;
+  }
+  .hero-sub { font-size: 15px; color: var(--muted); margin-bottom: 30px; max-width: 580px; line-height: 1.7; }
+  .hero-search {
+    display: flex; align-items: center; gap: 10px; width: 100%; max-width: 660px;
+    background: var(--panel); border: 2px solid var(--border); border-radius: 999px;
+    padding: 7px 7px 7px 24px; box-shadow: 0 6px 24px rgba(20,20,19,0.08);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .hero-search:focus-within { border-color: var(--accent); box-shadow: 0 8px 30px rgba(217,119,87,0.18); }
+  .hero-search input {
+    flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+    font-size: 15px; font-family: var(--font-body); color: var(--text);
+  }
+  .hero-search input::placeholder { color: #b0aca0; }
+  .hero-btn {
+    border: none; border-radius: 999px; padding: 10px 22px; font-size: 14px;
+    font-weight: 600; cursor: pointer; font-family: var(--font-head);
+    transition: all .15s; white-space: nowrap;
+  }
+  .hero-btn.search { background: var(--accent); color: #fff; }
+  .hero-btn.search:hover { background: var(--accent-2); }
+  .hero-btn.gen { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+  .hero-btn.gen:hover { border-color: var(--accent); color: var(--accent-2); }
+  .home-body { max-width: 1080px; margin: 0 auto; padding: 12px 24px 60px; }
+  .home-sec-title { font-size: 15px; font-weight: 700; font-family: var(--font-head); margin: 30px 0 14px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .home-sec-title .sub { font-size: 12px; color: var(--muted); font-weight: 400; }
+  /* Guest login guide banner */
+  .login-guide {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    max-width: 1080px; margin: 8px auto 0; padding: 14px 22px;
+    background: linear-gradient(135deg, #fbf3e0, #f8e8cc);
+    border: 1px solid #e5d5a8; border-radius: 14px;
+  }
+  .login-guide span { font-size: 14px; color: #6b5316; }
+  .login-guide button {
+    background: var(--accent); color: #fff; border: none; border-radius: 999px;
+    padding: 9px 22px; font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: var(--font-head); white-space: nowrap;
+  }
+  .login-guide button:hover { background: var(--accent-2); }
+  /* Launchpad tiles (signed-in) */
+  .lp-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;
+  }
+  .lp-tile {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 18px;
+    padding: 22px 12px 16px; cursor: pointer; transition: all .15s;
+  }
+  .lp-tile:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow); }
+  .lp-tile .lp-icon {
+    width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 30px; background: linear-gradient(135deg, #f1efe7, #e3dfd3);
+  }
+  .lp-tile .lp-name { font-size: 13px; font-weight: 600; font-family: var(--font-head); text-align: center; line-height: 1.3; }
+  .lp-tile.lp-more { border-style: dashed; color: var(--muted); justify-content: center; }
+  .lp-tile.lp-more .lp-icon { background: var(--panel-2); color: var(--muted); font-size: 28px; }
+  .lp-tile.lp-more:hover { color: var(--accent-2); }
+  .lp-empty {
+    text-align: center; padding: 60px 20px; color: var(--muted); background: var(--panel);
+    border: 1px dashed var(--border); border-radius: 18px; font-size: 14px; line-height: 1.7;
+  }
+  .lp-empty .big { font-size: 40px; margin-bottom: 12px; }
+  /* Reserved slots: AI entry / ad (hidden by default, enable later for ecosystem) */
+  .home-ai-row { max-width: 1080px; margin: 20px auto 0; padding: 0 24px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .ai-entry {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 999px;
+    padding: 8px 18px; font-size: 13px; color: var(--muted); cursor: pointer;
+    transition: all .15s;
+  }
+  .ai-entry:hover { border-color: var(--accent); color: var(--accent-2); }
+  .home-ad { max-width: 1080px; margin: 24px auto 0; padding: 0 24px; }
+  .ad-slot {
+    border: 1px dashed var(--border); border-radius: 12px; height: 90px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #b9b5a9; background: var(--panel);
+  }
+  /* My Apps card action buttons */
+  .my-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .my-btn {
+    flex: 1; min-width: 0; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 7px; padding: 6px 6px; font-size: 12px; color: var(--muted);
+    cursor: pointer; transition: all .15s;
+  }
+  .my-btn:hover { border-color: var(--accent); color: var(--text); }
+  .my-btn.publish { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .my-btn.launch { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .my-btn.uninstall { border-color: var(--err); color: var(--err); }
+  .my-btn.uninstall:hover { background: var(--err); color: #fff; }
+  .my-btn.danger:hover { border-color: var(--err); color: var(--err); }
+  .market-empty { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--muted); }
+  .market-empty .big { font-size: 40px; margin-bottom: 12px; }
+  .market-empty p { font-size: 14px; line-height: 1.6; }
+
+  .sec-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .sec-title .sub { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+  /* ===== App window ===== */
+  .app-window {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: var(--overlay); backdrop-filter: blur(4px);
+  }
+  .app-window.show { display: flex; align-items: center; justify-content: center; }
+  .app-window .window-frame {
+    width: 90%; max-width: 680px; max-height: calc(100vh - 110px);
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: windowIn .2s ease;
+  }
+  @keyframes windowIn { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .app-window.fully { bottom: 60px; } /* fullscreen window leaves room for the bottom nav bar */
+  .app-window.fully .window-frame {
+    width: 100%; max-width: 100%; height: 100%; max-height: 100%;
+    border: none; border-left: 1px solid var(--border);
+    border-radius: 14px 14px 0 0;
+  }
+  .app-window .window-body { flex: 1; overflow: auto; padding: 20px; min-height: 300px; }
+  .app-window .window-titlebar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .app-window .window-titlebar .win-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .app-window .window-titlebar .win-name { font-size: 15px; font-weight: 700; }
+  .app-window .window-titlebar .win-platforms { display: flex; gap: 4px; }
+  .app-window .window-titlebar .win-actions { display: flex; gap: 8px; }
+  .win-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--muted); font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .win-btn:hover { background: var(--panel-2); color: var(--text); }
+  .win-btn.close:hover { background: #b3412c; color: #fff; border-color: #b3412c; }
+  .app-window .mock-content {
+    font-family: "SF Mono", Consolas, "Courier New", monospace;
+    font-size: 13px; line-height: 1.6; white-space: pre; color: var(--text);
+    background: #f4f2ea; border: 1px solid var(--border); border-radius: 10px; padding: 20px;
+  }
+  .app-window .run-area { display: flex; flex-direction: column; gap: 12px; }
+  .app-window .run-toolbar { display: flex; align-items: center; gap: 12px; }
+  .app-window .run-btn {
+    background: linear-gradient(135deg, #d97757, #a8553a); color: #fff; border: 0;
+    border-radius: 8px; padding: 8px 16px; font-size: 13px; cursor: pointer;
+  }
+  .app-window .run-btn:disabled { opacity: .6; cursor: default; }
+  .app-window .run-status { font-size: 12px; color: var(--muted); }
+  .app-window .run-output {
+    font-family: "SF Mono", Consolas, "Courier New", monospace;
+    font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+    color: var(--text); background: #f4f2ea; border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px; min-height: 120px;
+  }
+  .app-window .run-output.err { color: #b3412c; }
+  .app-window .window-owner {
+    display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);
+    border-top: 1px solid var(--border); padding: 10px 18px; background: var(--panel);
+  }
+  .app-window .window-source {
+    border-top: 1px solid var(--border); padding: 14px 18px; background: var(--panel-2);
+  }
+  .app-window .window-source .custom-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .app-window .custom-btns { display: flex; gap: 8px; align-items: center; }
+  .app-window .custom-gen {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background .15s;
+  }
+  .app-window .custom-gen:hover { background: var(--accent-2); }
+  .app-window .report-btn {
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; transition: all .15s;
+  }
+  .app-window .report-btn:hover { border-color: var(--err); color: var(--err); }
+
+  /* ===== Interactive app UI (real operable UI rendered per template) ===== */
+  .app-ui { display: flex; flex-direction: column; gap: 14px; }
+  .app-mini-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .app-mini-card h3 { margin: 0 0 8px; font-size: 15px; }
+  .app-mini-card p { margin: 4px 0; color: var(--muted); font-size: 13px; }
+  /* Todo */
+  .todo-add { display: flex; gap: 8px; }
+  .todo-add input { flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); }
+  .todo-add button { padding: 0 18px; border-radius: 8px; border: 0; background: var(--accent); color: #fff; cursor: pointer; font-weight: 600; }
+  .todo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .todo-item { display: flex; align-items: center; gap: 10px; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; }
+  .todo-item.done .todo-text { text-decoration: line-through; color: var(--muted); }
+  .todo-item .todo-del { margin-left: auto; cursor: pointer; color: var(--muted); border: none; background: none; font-size: 16px; }
+  .todo-item .todo-del:hover { color: var(--err); }
+  /* Image filter */
+  .img-filter { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  .img-filter canvas { max-width: 100%; border-radius: 10px; border: 1px solid var(--border); background: #f4f2ea; }
+  .img-filter .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .img-filter .filter-bar button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); cursor: pointer; }
+  .img-filter .filter-bar button:hover { background: var(--panel-2); }
+  /* Focus pomodoro */
+  .pomodoro .pm-ring { text-align: center; padding: 20px 0 8px; }
+  .pomodoro .pm-time { font-size: 46px; font-weight: 800; font-family: var(--font-head); letter-spacing: 2px; }
+  .pomodoro .pm-mode { font-size: 14px; color: var(--muted); margin-top: 4px; }
+  .pomodoro .pm-progress { height: 8px; background: var(--panel-2); border-radius: 999px; margin: 14px auto 0; max-width: 320px; overflow: hidden; }
+  .pomodoro .pm-fill { height: 100%; width: 0; background: linear-gradient(90deg,#d97757,#f0b27a); transition: width 1s linear; }
+  .pomodoro .pm-btns { display: flex; gap: 10px; justify-content: center; }
+  .pomodoro .pm-btn { padding: 10px 26px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--accent); color: #fff; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .pomodoro .pm-btn:hover { background: var(--accent-2); }
+  .pomodoro .pm-stats { text-align: center; font-size: 13px; color: var(--muted); }
+  .pomodoro .pm-log { display: flex; flex-direction: column; gap: 6px; }
+  .pomodoro .pm-log-item { font-size: 13px; color: var(--muted); background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; }
+  .pomodoro .pm-log-empty { font-size: 13px; color: var(--muted); text-align: center; padding: 12px; }
+  /* Kids memory match */
+  .memory .mem-top { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .memory .mem-top b { color: var(--text); }
+  .memory .mem-new { margin-left: auto; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); cursor: pointer; font-size: 13px; }
+  .memory .mem-new:hover { border-color: var(--accent); }
+  .memory .mem-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .memory .mem-card {
+    aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--border);
+    background: linear-gradient(135deg, #f1efe7, #e3dfd3); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: transform .12s;
+  }
+  .memory .mem-card:hover { transform: scale(1.03); }
+  .memory .mem-card .mem-sym { opacity: 0; font-size: 32px; transition: opacity .15s; }
+  .memory .mem-card.on .mem-sym, .memory .mem-card.ok .mem-sym { opacity: 1; }
+  .memory .mem-card.on { background: var(--panel-2); border-color: var(--accent); }
+  .memory .mem-card.ok { background: #eef3e4; border-color: #788c5d; }
+  .memory .mem-done { text-align: center; font-size: 16px; font-weight: 700; color: var(--ok); }
+  /* Family movie list */
+  .tv .tv-cats { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tv .tv-cat { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--muted); cursor: pointer; font-size: 13px; }
+  .tv .tv-cat.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tv .tv-list { display: flex; flex-direction: column; gap: 8px; }
+  .tv .tv-item { display: flex; align-items: center; gap: 12px; background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .tv .tv-num { font-size: 16px; }
+  .tv .tv-title { flex: 1; font-size: 15px; font-weight: 600; }
+  /* Timestamp converter */
+  .ts { max-width: 420px; margin: 0 auto; }
+  .ts .ts-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .ts .ts-row label { font-size: 13px; font-weight: 600; min-width: 80px; font-family: var(--font-head); }
+  .ts .ts-row input { flex: 1; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: 14px; font-family: var(--font-body); color: var(--text); background: var(--panel);
+    outline: none; transition: border-color .15s; }
+  .ts .ts-row input:focus { border-color: var(--accent); }
+  .ts .ts-row input[type="datetime-local"] { min-width: 200px; }
+  .ts .ts-result { text-align: center; font-size: 18px; font-weight: 700; font-family: var(--font-head);
+    padding: 10px; background: var(--panel-2); border-radius: 10px; border: 1px solid var(--border);
+    margin: 4px 0 16px; word-break: break-all; }
+  .ts .ts-now { text-align: center; font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .ts .ts-now span { color: var(--text); font-weight: 600; font-family: monospace; }
+  .tv .tv-cat-tag { font-size: 12px; color: var(--muted); background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 2px 8px; }
+  .tv .tv-fav { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--muted); cursor: pointer; font-size: 13px; }
+  .tv .tv-fav:hover { border-color: var(--accent); color: var(--text); }
+  .tv .tv-empty { text-align: center; color: var(--muted); padding: 20px; }
+  .tv .tv-add { display: flex; gap: 8px; }
+  .tv .tv-add input { flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); font-size: 14px; }
+  .tv .tv-add select { padding: 9px 10px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); font-size: 13px; }
+  .tv .tv-addbtn { padding: 0 18px; border-radius: 8px; border: 0; background: var(--accent);
+    color: #fff; cursor: pointer; font-weight: 600; }
+
+  /* ===== Publish modal ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: var(--overlay); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    width: 92%; max-width: 440px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+    animation: windowIn .2s ease;
+  }
+  .modal h3 { font-size: 18px; margin-bottom: 4px; }
+  .modal .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+  .modal label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
+  .modal input, .modal textarea, .modal select {
+    width: 100%; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+    font-size: 14px; font-family: inherit; outline: none;
+  }
+  .modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--accent); }
+  .modal textarea { min-height: 60px; resize: vertical; }
+  .modal .modal-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .modal .m-btn {
+    padding: 9px 20px; border-radius: 8px; font-size: 14px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+    transition: all .15s;
+  }
+  .modal .m-btn:hover { border-color: var(--muted); }
+  .modal .m-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .modal .m-btn.primary:hover { background: var(--accent-2); }
+
+  /* ===== Login / register ===== */
+  .auth-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .auth-tab {
+    flex: 1; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px; color: var(--muted); cursor: pointer; font-size: 13px;
+    transition: all .15s;
+  }
+  .auth-tab:hover { color: var(--text); }
+  .auth-tab.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .auth-msg { font-size: 12px; min-height: 16px; margin-top: 8px; }
+  .auth-msg.err { color: var(--err); }
+  .auth-msg.ok { color: var(--ok); }
+  .start-menu .sm-user { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 6px; }
+  .start-menu .sm-user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+  .start-menu .sm-avatar {
+    width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #d97757, #a8553a); font-size: 16px; flex-shrink: 0;
+  }
+  .start-menu .sm-user-info b { color: var(--accent-2); }
+  .start-menu .role-badge { font-size: 10px; padding: 1px 7px; border-radius: 4px; background: var(--tag-bg); color: var(--accent-2); border: 1px solid var(--tag-border); margin-left: 4px; }
+  .start-menu .sm-user-login {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px;
+    padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%;
+  }
+  .start-menu .sm-user-login:hover { background: var(--accent-2); }
+  .start-menu .sm-user-logout {
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--muted);
+    border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 12px;
+  }
+  .start-menu .sm-user-logout:hover { color: var(--text); }
+
+  /* ===== Mobile adaptation ===== */
+  @media (max-width: 768px) {
+    .wrap { padding: 14px 12px 100px; }
+    .sec-title { font-size: 15px; flex-wrap: wrap; }
+    .avail-bar, .filter-bar { gap: 6px; }
+    .app-window .window-titlebar { padding: 10px 12px; }
+    .app-window .window-titlebar .win-name { font-size: 14px; }
+    .app-window .window-body { padding: 14px; }
+    .app-window .window-source { padding: 12px; }
+    .app-window .window-source .custom-row { flex-wrap: wrap; }
+    .app-window .custom-btns { flex-wrap: wrap; }
+    .calc-display { font-size: 20px; padding: 12px 12px; }
+  }
+  @media (max-width: 480px) {
+    .dock { padding: 6px 10px; gap: 6px; }
+    .start-menu { bottom: 60px; }
+    .bb-tasks { order: 3; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Bottom nav bar: start button + fixed app tasks + running apps + session ===== -->
+<div class="dock" id="dock">
+  <button class="start-btn" id="startBtn" onclick="toggleStartMenu()" data-i18n-t="Start menu" title="Start menu">🪐</button>
+  <div class="nav-tasks">
+    <button class="dock-task on" data-view="home" onclick="smGo('home')" data-i18n-t="Home" title="Home">🏠</button>
+    <button class="dock-task" data-view="market" onclick="smGo('market')" data-i18n-t="App Market" title="App Market">🛍</button>
+    <button class="dock-task" data-view="myapps" onclick="smGo('myapps')" data-i18n-t="My Apps" title="My Apps">👤</button>
+  </div>
+  <div class="bb-tasks" id="taskIcons"></div>
+</div>
+
+<!-- ===== Start menu: session + pinned system features as app tiles ===== -->
+<div class="start-menu" id="startMenu" hidden>
+  <div class="sm-user" id="smUser"></div>
+  <div class="sm-divider"></div>
+  <div class="sm-stats" id="marketCount"></div>
+  <div class="sm-grid">
+    <button class="sm-tile" onclick="openSettings()">
+      <span class="sm-tile-ico" style="background:linear-gradient(135deg,#6b7bb0,#525f8f)">⚙️</span>
+      <span class="sm-tile-name" data-i18n="Settings">Settings</span>
+    </button>
+    <button class="sm-tile" onclick="onGenClick()">
+      <span class="sm-tile-ico" style="background:linear-gradient(135deg,#9b6bae,#7a4f8b)">✨</span>
+      <span class="sm-tile-name" data-i18n="Generate App">Generate App</span>
+    </button>
+  </div>
+  <div class="sm-divider"></div>
+  <div class="sm-lang">
+    <button class="lang-btn" data-lang="zh-CN" onclick="setLang('zh-CN')">中文</button>
+    <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<!-- ===== Settings modal ===== -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h3>⚙️ <span data-i18n="Settings">Settings</span></h3>
+    <div class="modal-sub" data-i18n="Platform preferences">Platform preferences</div>
+    <label data-i18n="Language">Language</label>
+    <div class="sm-lang set-lang">
+      <button class="lang-btn" data-lang="zh-CN" onclick="setLang('zh-CN')">中文</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+    <div class="modal-hint set-about">aiapp · AI-native cross-platform apps</div>
+    <div class="modal-actions">
+      <button class="m-btn primary" onclick="closeSettings()" data-i18n="Done">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Generator window (create / update apps as an app) ===== -->
+<div class="app-window" id="genWindow">
+  <div class="window-frame">
+    <div class="window-titlebar">
+      <div class="win-info">
+        <span class="win-name" id="genWinName" data-i18n="✨ Generate App">✨ Generate App</span>
+      </div>
+      <div class="win-actions">
+        <button class="win-btn" onclick="minimizeGen()" data-i18n-t="Minimize to background" title="Minimize to background">─</button>
+        <button class="win-btn" id="genWinMaxBtn" onclick="maximizeGen()" data-i18n-t="Maximize" title="Maximize">□</button>
+        <button class="win-btn close" onclick="closeGenerator()" data-i18n-t="Close" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="window-body gen-body">
+      <div class="gen-drawer" id="genDrawer">
+        <div class="mode-switch">
+          <button class="mode-btn on" data-mode="new" onclick="setMode('new')" data-i18n="🆕 New App">🆕 New App</button>
+          <button class="mode-btn" data-mode="update" onclick="setMode('update')" data-i18n="🔄 Update App">🔄 Update App</button>
+        </div>
+        <div class="update-target" id="updateTarget" hidden>
+          <span data-i18n="App to update:">App to update:</span>
+          <select id="updateSelect"></select>
+        </div>
+        <textarea id="descInput" data-i18n-ph="Describe the app you want, e.g. build a small tool that sums this month's incoming payments and groups them by date" placeholder="Describe the app you want, e.g. build a small tool that sums this month's incoming payments and groups them by date"></textarea>
+        <div class="gen-row">
+          <div class="tpl-mini" id="tplMini"></div>
+        </div>
+        <div class="gen-row cat-row">
+          <label class="gen-cat-label" data-i18n="Category:">Category:</label>
+          <select id="genCategory" onchange="onCategoryAuto()">
+            <option value="" data-i18n="Auto-detect">Auto-detect</option>
+          </select>
+          <span class="gen-cat-hint" id="genCatHint"></span>
+        </div>
+        <div class="gen-row">
+          <button class="gen-submit" id="genSubmit" onclick="generateApp()" data-i18n="✨ Generate">✨ Generate</button>
+        </div>
+        <div class="gen-result" id="genResult"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Home container ===== -->
+<div class="wrap">
+  <!-- Home view: Bing-style entrance / launchpad -->
+  <div id="viewHome">
+    <div class="home-hero">
+      <div class="hero-logo">aiapp</div>
+      <div class="hero-sub" id="heroSub"></div>
+      <div class="hero-search">
+        <input id="homeSearchInput" data-i18n-ph="Search apps, or describe the AI app you want" placeholder="Search apps, or describe the AI app you want" onkeydown="if(event.key==='Enter')homeSearch()">
+        <button class="hero-btn search" onclick="homeSearch()">🔍 <span data-i18n="Search">Search</span></button>
+        <button class="hero-btn gen" onclick="homeGenerate()">✨ <span data-i18n="Generate">Generate</span></button>
+      </div>
+    </div>
+    <div class="home-ai-row" id="homeAiRow" hidden></div>
+    <div class="login-guide" id="loginGuide" hidden>
+      <span data-i18n="Sign in to launch apps with one click and collect them automatically">Sign in to launch apps with one click and collect them automatically</span>
+      <button onclick="openLogin()">🔐 <span data-i18n="Log in / Register">Log in / Register</span></button>
+    </div>
+    <div class="home-body" id="homeBody"></div>
+    <div class="home-ad" id="homeAd" hidden><div class="ad-slot" data-i18n="Ad space (reserved)">Ad space (reserved)</div></div>
+  </div>
+</div>
+
+<!-- ===== App window ===== -->
+<div class="app-window" id="appWindow">
+  <div class="window-frame">
+    <div class="window-titlebar">
+      <div class="win-info">
+        <span class="win-name" id="winName"></span>
+        <span class="ver-badge" id="winVersion"></span>
+        <span class="win-platforms" id="winPlatforms"></span>
+      </div>
+      <div class="win-actions">
+        <button class="win-btn" id="winStandaloneBtn" onclick="openStandalone()" data-i18n-t="Open in a new tab" title="Open in a new tab">↗</button>
+        <button class="win-btn" onclick="minimizeApp()" data-i18n-t="Minimize to background" title="Minimize to background">─</button>
+        <button class="win-btn" id="winMaxBtn" onclick="maximizeApp()" data-i18n-t="Maximize" title="Maximize">□</button>
+        <button class="win-btn close" onclick="closeApp()" data-i18n-t="Close app" title="Close app">✕</button>
+      </div>
+    </div>
+    <div class="window-body" id="winBody"></div>
+    <div class="window-owner" id="winOwner"></div>
+    <div class="window-source">
+      <div class="custom-row">
+        <div class="custom-btns" id="winActionBtns"></div>
+        <button class="report-btn" onclick="reportApp()" data-i18n="Report">Report</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== System window: platform modules (App Market / My Apps) as apps ===== -->
+<div class="app-window" id="sysWindow">
+  <div class="window-frame">
+    <div class="window-titlebar">
+      <div class="win-info">
+        <span class="win-name" id="sysWinName"></span>
+      </div>
+      <div class="win-actions">
+        <button class="win-btn" onclick="minimizeSysApp()" data-i18n-t="Minimize to background" title="Minimize to background">─</button>
+        <button class="win-btn" id="sysWinMaxBtn" onclick="maximizeSysApp()" data-i18n-t="Maximize" title="Maximize">□</button>
+        <button class="win-btn close" onclick="closeSysApp()" data-i18n-t="Close app" title="Close app">✕</button>
+      </div>
+    </div>
+    <div class="window-body" id="sysWinBody">
+      <!-- App Market module (system app) -->
+      <div id="viewMarket" hidden>
+        <div class="avail-bar" id="availBar"></div>
+        <div class="market-search" id="marketSearch">
+          <input id="marketSearchInput" data-i18n-ph="Search in market..." placeholder="Search in market..." onkeydown="if(event.key==='Enter')marketSearch()">
+          <button class="clear-btn" id="marketClearBtn" onclick="marketClearSearch()" hidden>✕</button>
+        </div>
+        <div class="filter-bar" id="filterBar"></div>
+        <div class="app-grid" id="marketGrid"></div>
+      </div>
+      <!-- My Apps module (system app) -->
+      <div id="viewMyApps" hidden>
+        <div class="sec-title"><span data-i18n="👤 My Apps">👤 My Apps</span> <span class="sub" data-i18n="Apps you have launched are collected here automatically; apps you create can be published to the market">Apps you have launched are collected here automatically; apps you create can be published to the market</span></div>
+        <div class="app-grid" id="myGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Publish modal ===== -->
+<div class="modal-overlay" id="pubModal">
+  <div class="modal">
+    <h3 data-i18n="🚀 Publish to App Market">🚀 Publish to App Market</h3>
+    <div class="modal-sub" data-i18n="Auto review by category: tool / office apps auto-approve; the rest enter manual review">Auto review by category: tool / office apps auto-approve; the rest enter manual review</div>
+    <label data-i18n="App name *">App name *</label>
+    <input id="pubName" data-i18n-ph="Give your app a good name" placeholder="Give your app a good name">
+    <label data-i18n="App description">App description</label>
+    <textarea id="pubDesc" data-i18n-ph="Describe in one sentence what this app does" placeholder="Describe in one sentence what this app does"></textarea>
+    <label data-i18n="App category">Category</label>
+    <select id="pubCategory"></select>
+    <label data-i18n="Share scope">Share scope</label>
+    <div class="share-options">
+      <label class="share-opt"><input type="radio" name="pubShare" value="public" checked><span><b data-i18n="Public">Public</b><small data-i18n="Published to the app center, visible to everyone">Published to the app center, visible to everyone</small></span></label>
+      <label class="share-opt"><input type="radio" name="pubShare" value="org"><span><b data-i18n="Org">Org</b><small data-i18n="Visible only to members of the org">Visible only to members of the org</small></span></label>
+    </div>
+    <div class="pub-row">
+      <label class="gen-cat-label" data-i18n="App type:">App type:</label>
+      <select id="pubKind">
+        <option value="app" data-i18n="Regular App">Regular App</option>
+        <option value="web" data-i18n="Webpage (standalone)">Webpage (standalone)</option>
+      </select>
+      <label class="pub-check" title=""><input type="checkbox" id="pubHideBrand"><span data-i18n="Hide platform branding on standalone page (paid)">Hide platform branding on standalone page (paid)</span></label>
+    </div>
+    <label data-i18n="Tags (separate with Chinese or English commas)">Tags (separate with Chinese or English commas)</label>
+    <input id="pubTags" data-i18n-ph="Utilities, Office" placeholder="Utilities, Office">
+    <label data-i18n="Supported platforms (separate with commas)">Supported platforms (separate with commas)</label>
+    <input id="pubPlatforms" data-i18n-ph="Web, Mobile, macOS, Windows, HarmonyOS, Car, TV Box" placeholder="Web, Mobile, macOS, Windows, HarmonyOS, Car, TV Box">
+    <div class="modal-hint" data-i18n="Leave tags and platforms empty to skip them; they become filterable in the market after publishing">Leave tags and platforms empty to skip them; they become filterable in the market after publishing</div>
+    <div class="modal-actions">
+      <button class="m-btn" onclick="closePublish()" data-i18n="Cancel">Cancel</button>
+      <button class="m-btn primary" onclick="confirmPublish()" data-i18n="Publish">Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Login / register ===== -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <h3 id="authTitle" data-i18n="Log in to aiapp">Log in to aiapp</h3>
+    <div class="auth-tabs">
+      <div class="auth-tab on" data-mode="login" onclick="setAuthMode('login')" data-i18n="Log in">Log in</div>
+      <div class="auth-tab" data-mode="register" onclick="setAuthMode('register')" data-i18n="Register">Register</div>
+    </div>
+    <label data-i18n="Username">Username</label>
+    <input id="authUser" data-i18n-ph="Username" placeholder="Username" autocomplete="username" />
+    <label style="margin-top:14px" data-i18n="Password">Password</label>
+    <input id="authPass" type="password" data-i18n-ph="Password (at least 6 characters)" placeholder="Password (at least 6 characters)" autocomplete="current-password" onkeydown="if(event.key==='Enter')authSubmit()" />
+    <div class="auth-msg" id="authMsg"></div>
+    <div class="modal-actions">
+      <button class="m-btn" onclick="closeAuth()" data-i18n="Cancel">Cancel</button>
+      <button class="m-btn primary" id="authSubmitBtn" onclick="authSubmit()">Log in</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer" data-i18n="aiapp-mb · AI-native apps, one codebase, cross-platform everywhere">
+  aiapp-mb · AI-native apps, one codebase, cross-platform everywhere
+</div>
+
+<script src="/static/sql-wasm.js"></script>
+<script>
+// ====== i18n (multi-language) ======
+const SUPPORTED_LANGS = ['en', 'zh-CN'];
+const I18N_ZH = {
+  '· AI-native': '· AI 原生',
+  '🛍 App Market': '🛍 应用市场',
+  '👤 My Apps': '👤 我的应用',
+  '🛠 Admin': '🛠 管理后台',
+  '✨ Generate App': '✨ 生成新应用',
+  '🏠 Home': '🏠 首页',
+  'Search apps, or describe the AI app you want': '搜索应用，或描述你想要的 AI 应用',
+  'Search in market...': '在市场中搜索...',
+  'Search': '搜索',
+  'Generate': '生成',
+  'Your AI App Launchpad': '你的 AI 应用启动台',
+  'Browse apps, launch with one click, and collect them automatically. Sign in to start.': '浏览应用，一键启动；登录后同步 & 收藏你的应用',
+  'Welcome back, {{name}} 👋': '欢迎回来，{{name}} 👋',
+  'Click an icon to launch. Discover more in the App Market.': '点击图标即刻启动，去「应用市场」发现更多',
+  'Sign in to launch apps with one click and collect them automatically': '登录后即可同步 & 收藏你的应用',
+  'Sign in to launch this app': '登录后即可启动该应用',
+  '🔥 Featured Apps': '🔥 精选应用',
+  '🌐 App Market': '🌐 应用市场',
+  'Your Apps': '我的应用',
+  'More Apps': '更多应用',
+  'No apps yet. Go to the App Market to instant-launch, or generate your first one.': '还没有应用，去「应用市场」秒启动，或「✨ 生成」你的第一个应用',
+  'Ad space (reserved)': '广告位（预留）',
+  'AI Assistant': 'AI 助手',
+  '🆕 New App': '🆕 新建应用',
+  '🔄 Update App': '🔄 更新应用',
+  'App to update:': '要更新的应用：',
+  'Describe the app you want, e.g. build a small tool that sums this month\'s incoming payments and groups them by date': '描述你想要的应用，比如：做一个统计本月到账金额的小工具，按日期汇总',
+  'Category:': '应用分类：',
+  'Auto-detect': '自动识别',
+  '✨ Generate': '✨ 生成',
+  'Apps you have launched are collected here automatically; apps you create can be published to the market': '启动过的应用会自动收录到这里；自己创建的应用可发布到市场',
+  '📊 Usage Stats': '📊 使用统计',
+  '📦 App Management': '📦 应用管理',
+  '👥 User Management': '👥 用户管理',
+  '🤖 Generation Prompt': '🤖 生成提示词',
+  'Minimize to background': '最小化到后台',
+  'Maximize': '最大化',
+  'Close app': '关闭应用',
+  'Report': '举报',
+  '📌 Background Apps': '📌 后台运行列表',
+  'No background apps yet': '暂无后台应用',
+  '✓ Link copied': '✓ 链接已复制',
+  'Copy failed': '复制失败',
+  'Powered by aiapp · Explore more apps': '由 aiapp 驱动 · 发现更多应用',
+  'Open in a new tab': '新标签页打开',
+  'App type:': '应用类型：',
+  'Regular App': '普通应用',
+  'Webpage (standalone)': '网页（独立访问）',
+  'Hide platform branding on standalone page (paid)': '独立页隐藏平台标识（付费）',
+  'Home': '首页',
+  'App Market': '应用市场',
+  'My Apps': '我的应用',
+  'Generate App': '生成新应用',
+  'Settings': '设置',
+  'Language': '语言',
+  'Platform preferences': '平台偏好设置',
+  'Done': '完成',
+  '🚀 Publish to App Market': '🚀 发布到应用市场',
+  'Auto review by category: tool / office apps auto-approve; the rest enter manual review': '按分类自动审核：工具 / 办公类自动通过，其余进入人工审核',
+  'App name *': '应用名称 *',
+  'Give your app a good name': '给应用起个好名字',
+  'App description': '应用描述',
+  'Describe in one sentence what this app does': '用一句话说明这个应用是做什么的',
+  'Category': '应用分类',
+  'Share scope': '共享范围',
+  'Public': '公开共享',
+  'Published to the app center, visible to everyone': '发布到应用中心，所有人可见',
+  'Org': '组织共享',
+  'Visible only to members of the org': '仅组织内成员可见',
+  'Tags (separate with Chinese or English commas)': '标签（用中文逗号或英文逗号分隔）',
+  'Utilities, Office': '实用工具, 办公效率',
+  'Supported platforms (separate with commas)': '支持平台（用逗号分隔）',
+  'Web, Mobile, macOS, Windows, HarmonyOS, Car, TV Box': '网页, 手机, macOS, Windows, 鸿蒙, 车机, 电视盒',
+  'Leave tags and platforms empty to skip them; they become filterable in the market after publishing': '标签和平台留空则不填写，发布后可在市场中筛选',
+  'Cancel': '取消',
+  'Publish': '发布',
+  'Log in': '登录',
+  'Register': '注册',
+  'Username': '用户名',
+  'Password': '密码',
+  'Password (at least 6 characters)': '密码（至少 6 位）',
+  'aiapp-mb · AI-native apps, one codebase, cross-platform everywhere': 'aiapp-mb · AI 原生应用，一份代码，通用跨平台运行',
+  'Collapse': '收起',
+  '(No app available)': '（暂无应用可选）',
+  '✗ Please select the app to update first': '✗ 请先选择要更新的应用',
+  'Will update "{{name}}" based on your new description.\nA new version will be created (v{{ver}} -> v{{next}}) and will take effect after the owner (you) approves.\nContinue?': '将根据你的新描述更新「{{name}}」。\n生成后会新增一个版本（v{{ver}} -> v{{next}}），需所有者（你）同意后生效。\n确定继续吗？',
+  'Generating…': '生成中…',
+  'Generation failed': '生成失败',
+  'Updated to new version v{{ver}} (only visible to you)': '已更新到新版本 v{{ver}}（仅你可使用）',
+  'New app created (only visible to you)': '已新建应用（仅你可使用）',
+  '▶ Use Now': '▶ 立即使用',
+  '🚀 Publish to Market': '🚀 发布到市场',
+  'View My Apps': '查看我的应用',
+  'Reference "{{name}}" to improve this app: ': '参考「{{name}}」优化这个应用：',
+  'Reference "{{name}}" to make a similar app: ': '参考「{{name}}」做一个类似的应用：',
+  'Improve "{{name}}":': '优化「{{name}}」：',
+  'Failed to load: {{msg}}': '加载失败：{{msg}}',
+  'Category': '分类',
+  'Current device: ': '当前设备：',
+  '✅ Available Now': '✅ 当前可用',
+  '🚫 Other Platforms': '🚫 其他平台可用',
+  'Market {{n}} apps': '市场 {{n}} 款',
+  'All apps that work on this device are here<br>Click "✨ Generate App" at the top to make your own': '当前设备可用的应用都在这了<br>可以点顶部「✨ 生成新应用」做一个',
+  'These apps run on other platforms<br>Switch back to "Available Now" to see what works on this device': '这些应用都能在其他平台运行<br>切回「当前可用」看本机可用的应用',
+  'No apps found for "{{q}}"': '没有找到「{{q}}」相关应用',
+  '✨ Generate this app now': '✨ 立即生成这个应用',
+  'online': '联网',
+  'local': '本地',
+  'Timestamp': '时间戳',
+  'Date Time': '日期时间',
+  'Invalid timestamp': '无效的时间戳',
+  'Invalid date': '无效的日期',
+  '🕰 Current Timestamp': '🕰 当前时间戳',
+  'Not supported on this device': '当前设备不支持',
+  '⚡ Instant Launch': '⚡ 秒启动',
+  'Published': '已发布',
+  'Under Review': '审核中',
+  'Disabled': '已停用',
+  'Draft': '草稿',
+  '🌐 Public': '🌐 公开',
+  '🏢 Org': '🏢 组织',
+  '🔒 Private': '🔒 私有',
+  'Share link copied:\n{{url}}': '已复制分享链接：\n{{url}}',
+  'Copy this link to share with others:': '复制这条链接分享给其他人：',
+  'No apps yet<br>Apps you use via "⚡ Instant Launch" in the market are collected here automatically<br>You can also click "✨ Generate App" at the top to create your own': '还没有应用<br>去市场点「⚡ 秒启动」用过的应用会自动收录到这里<br>也可以点顶部「✨ 生成新应用」自己创建',
+  '📄 Publish Settings': '📄 发布设置',
+  '🚀 Publish': '🚀 发布',
+  '🔄 Update': '🔄 更新',
+  '🔗 Share': '🔗 分享',
+  '🗑 Delete': '🗑 删除',
+  '🗑 Uninstall': '🗑 卸载',
+  'Saved': '已收藏',
+  'Delete app "{{name}}"?\n\nDeleting will also permanently remove all data this app saved on this device (todos, lists, best records, etc.), and it cannot be recovered.\nIf you need to keep the data, back it up first.': '确定删除应用「{{name}}」吗？\n\n删除后将同时清除该应用在本机保存的全部数据（待办、片单、最佳纪录等），不可恢复。\n如需保留数据，请先自行备份。',
+  'Delete failed': '删除失败',
+  'Uninstall app "{{name}}"?\n\nUninstalling will also permanently delete all data this app saved on this device (todos, lists, best records, etc.), and it cannot be recovered.\nIf you need to keep the data, back up the storage first.': '卸载应用「{{name}}」？\n\n卸载后将同时删除该应用在本机保存的全部数据（待办、片单、最佳纪录等），且不可恢复。\n如需保留数据，请先自行备份存储。',
+  'Uninstall failed': '卸载失败',
+  'Please enter an app name': '请填写应用名称',
+  'Publish failed': '发布失败',
+  'App not found': '应用不存在',
+  'Failed to open: {{msg}}': '打开失败：{{msg}}',
+  'Owner: ': '所有者：',
+  'Me': '我',
+  '🔗 Share Link': '🔗 分享链接',
+  '🔄 Update This App': '🔄 更新此应用',
+  'Generate a New App Based on This One': '基于此应用为生成新应用',
+  '(No description yet)': '（暂无描述）',
+  'Type: ': '类型：',
+  'Version: ': '版本：',
+  'Add a todo item…': '添加待办事项…',
+  'Add': '添加',
+  '⏳ Loading from local SQLite…': '⏳ 正在从本地 SQLite 加载…',
+  'Original': '原图',
+  'Grayscale': '灰度',
+  'Invert': '反色',
+  'Sepia': '复古',
+  'Please pick an image first': '请先选择一张图片',
+  'Focus': '专注',
+  'Break': '休息',
+  'Start': '开始',
+  'Pause': '暂停',
+  'Resume': '继续',
+  'Reset': '重置',
+  'Focus {{n}} sessions today': '今日专注 {{n}} 次',
+  'Start a pomodoro!': '开始一个番茄钟吧',
+  'Focus {{n}} · Break {{m}}': '专注 {{n}} 次 · 休息 {{m}} 次',
+  'Left {{n}} cards': '剩余 {{n}} 张',
+  'Moves {{n}}': '步数 {{n}}',
+  'Best {{n}}': '最佳 {{n}}',
+  'New': '重开',
+  '🎉 New record!': '🎉 新纪录！',
+  '🎉 Done!': '🎉 完成！',
+  'Movie name': '影片名称',
+  'Sci-Fi': '科幻',
+  'Animation': '动画',
+  'Documentary': '纪录片',
+  'Comedy': '喜剧',
+  'No movies in this category': '该分类暂无影片',
+  'Save': '收藏',
+  'Saved {{n}} movies': '收藏 {{n}} 部',
+  'Restore window': '还原窗口',
+  'Please briefly describe why you are reporting "{{name}}":': '请简要说明举报「{{name}}」的原因：',
+  'Report failed': '举报失败',
+  'Thanks, your report on "{{name}}" has been received. The admin will review it.': '已收到你对「{{name}}」的举报，管理员会在后台核查处理。',
+  'Report failed: {{msg}}': '举报失败：{{msg}}',
+  'Admin': '管理员',
+  'User': '用户',
+  'Active': '正常',
+  '📊 Platform Overview': '📊 平台概览',
+  'Overview of app usage, providing data for future operations such as user incentives and ad revenue share': '应用使用情况总览，为后续用户激励、广告分成等运营提供数据依据',
+  'Total Apps': '应用总数',
+  'Total Launches': '累计启动',
+  'Registered Users': '注册用户',
+  'Active Users': '活跃用户',
+  'Incentives Issued': '已发放激励',
+  '🏆 Top Popular Apps': '🏆 热门应用 TOP',
+  'Sorted by launch count': '按启动次数排序',
+  'No data': '暂无数据',
+  '👥 User Contribution': '👥 用户贡献',
+  'Generated apps and launches (incentive is placeholder data for a future incentive plan)': '生成数与启动量（激励为后续激励计划的占位数据）',
+  '✅ Approve': '✅ 通过',
+  '⛔ Reject': '⛔ 驳回',
+  '🛑 Disable': '🛑 停用',
+  '✏️ Edit': '✏️ 编辑',
+  '▶ Restore': '▶ 恢复',
+  '🚀 Publish': '🚀 上架',
+  'Review, publish, disable, edit and take down apps. Newly published apps enter "Under Review" and only become public on the market after approval': '审核、上架、停用、编辑与下架。新发布的应用进入“审核中”，通过后才对市场公开',
+  'All': '全部',
+  'Please enter the rejection reason:': '请填写驳回意见：',
+  'Operation failed': '操作失败',
+  'App name:': '应用名称：',
+  'App description:': '应用描述：',
+  'Tags (comma-separated):': '标签（逗号分隔）：',
+  'Supported platforms (comma-separated):': '支持平台（逗号分隔）：',
+  'Edit failed': '编辑失败',
+  'Delete this app? This cannot be undone.': '确定删除该应用吗？此操作不可恢复。',
+  '▶ Enable': '▶ 启用',
+  'Manage platform users; enable / disable accounts (single-user prototype with preset sample users)': '管理平台用户，可启用 / 停用账号（单用户原型，预置示例用户）',
+  '🤖 Generation Skill Prompt': '🤖 生成应用技能提示词',
+  'The text is maintained independently with versioning and structured sections for continuous online iteration; changes take effect immediately for subsequent generations after saving': '文本独立维护、带版本号、结构化分区，可在线持续迭代；保存后对后续生成立即生效',
+  'Version {{v}}': '版本 {{v}}',
+  '↺ Restore Built-in Default': '↺ 恢复内置默认',
+  '💾 Save & Apply': '💾 保存生效',
+  'Save failed': '保存失败',
+  'Saved and applied; future generations will use the latest prompt.': '已保存并生效，后续生成将使用最新提示词。',
+  'Restore the built-in default prompt? Your current edits will be overwritten.': '恢复为内置默认提示词？当前编辑内容将被覆盖。',
+  'Restore failed': '恢复失败',
+  'Built-in default prompt restored. Click "Save & Apply" to make it take effect.': '已恢复内置默认提示词，点“保存生效”使其生效。',
+  'Log out': '退出',
+  'Log in / Register': '登录 / 注册',
+  'Admin permission required': '需要管理员权限',
+  'Create Account': '注册新账号',
+  'Log in to aiapp': '登录 aiapp',
+  'Register & Log in': '注册并登录',
+  'Please enter a username': '请输入用户名',
+  'Please enter a password': '请输入密码',
+  'Password must be at least 6 characters': '密码至少 6 位',
+  'Processing…': '处理中…',
+  'Success, entering…': '成功，正在进入…',
+  'Network error: {{msg}}': '网络错误：{{msg}}',
+  'minimal': '极简',
+  'todo': '待办',
+  'image-filter': '图片滤镜',
+  'pomodoro': '番茄钟',
+  'memory-game': '记忆翻牌',
+  'tv-movies': '影音片单',
+  'App category': '应用分类',
+  'Category filter': '分类',
+  'Add failed: {{msg}}': '添加失败：{{msg}}',
+  'Collected': '已收录',
+  'Left': '剩余',
+  'Moves': '步数',
+  'Best': '最佳',
+  'cards': '张',
+  'Minimal': '极简',
+  'Todo': '待办',
+  'Image Filter': '图片滤镜',
+  'Pomodoro': '番茄钟',
+  'Memory Game': '记忆翻牌',
+  'Family Movies': '影音片单',
+  'App': '应用',
+  'Owner': '所有者',
+  'Status': '状态',
+  'Launches': '启动次数',
+  'Tags': '标签',
+  'Platforms': '平台',
+  'Reports': '举报',
+  'Review Note': '审核意见',
+  'Actions': '操作',
+  'Role': '角色',
+  'Generated': '生成应用',
+  'Incentive': '激励',
+  'Car': '车机',
+  'Mobile': '手机',
+  'Tablet': '平板',
+  'Desktop': '电脑',
+  'Category auto-derived from template': '按模板自动推导分类',
+  'This category requires manual review; it enters the review queue after publishing': '该分类需人工审核，发布后进入审核队列',
+  'Tool / office categories auto-approve; publish directly after generation': '工具 / 办公类自动审核通过，生成后可直接发布',
+  'Utilities': '实用工具',
+  'Office': '办公协作',
+  'Entertainment': '影音娱乐',
+  'Games': '小游戏',
+  'Family & Kids': '亲子教育',
+  'Life & Health': '生活健康',
+  'Industry': '行业应用',
+  'Other': '其他',
+};
+let currentLang = (() => {
+  const saved = localStorage.getItem('aiapp_lang');
+  if (saved && SUPPORTED_LANGS.includes(saved)) return saved;
+  return (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh-CN' : 'en';
+})();
+const TPL_TO_LABEL = { minimal: 'Minimal', todo: 'Todo', 'image-filter': 'Image Filter', pomodoro: 'Pomodoro', 'memory-game': 'Memory Game', 'tv-movies': 'Family Movies' };
+// Canonical bilingual display names/descriptions for built-in sample apps (independent of stored data,
+// so both zh-CN and en modes show correct names even with a legacy database).
+const SEED_LOC = {
+  'quit-smoking': { en: 'Quit Smoking Tracker', zh: '戒烟打卡', enDesc: 'Track smoke-free time, money saved, and health recovery milestones with daily progress, craving log, and achievement badges', zhDesc: '追踪戒烟时长、节省金额和健康恢复里程碑，含每日进展、渴望日志和成就徽章，帮你坚持戒烟' },
+  'learn-english': { en: 'Daily English Learning', zh: '每日学英语', enDesc: 'Categorized vocabulary, sentence patterns, listening quizzes, streak tracking, and progress dashboard for daily English practice', zhDesc: '分类词汇、句型练习、听力小测、连续打卡和进度面板，每天进步一点点' },
+  'emergency-room': { en: 'Emergency Command Center', zh: '应急指挥室', enDesc: 'Emergency contact panel, medical info card, household emergency checklists, and step-by-step crisis response guides', zhDesc: '紧急联系人面板、医疗信息卡、家庭应急清单和分步式危机应对指南，未雨绸缪' },
+  'project-hub': { en: 'Project Management Hub', zh: '项目管理工作台', enDesc: 'Kanban-style project management with task lists, priority labels, due dates, progress tracking, and productivity reports — all local', zhDesc: '看板式项目管理，支持任务列表、优先级标签、截止日期、进度追踪和生产力报告，所有数据本地存储' },
+  'car-sound': { en: 'Car Engine Sound Simulator', zh: '汽车声浪模拟器', enDesc: 'Browse and play engine sound profiles from supercars, muscle cars, JDM, classic, and electric vehicles with virtual throttle', zhDesc: '浏览并播放超跑、肌肉车、JDM、经典车和电动车的引擎声浪，虚拟油门模拟真实轰鸣' },
+  'screensaver-calligraphy': { en: 'Calligraphy Screensaver', zh: '书法艺术屏保', enDesc: 'Dynamic TV screensaver showcasing Chinese calligraphy masterpieces with smooth transitions and clock overlay', zhDesc: '动态电视屏保，展示历代书法名家名作，平滑过渡切换，支持时钟叠加，适配多种电视尺寸' },
+  'screensaver-art': { en: 'Art Gallery Screensaver', zh: '唯美艺术屏保', enDesc: 'Curated art gallery screensaver featuring world-famous paintings with Ken Burns transitions and clock overlay', zhDesc: '精选世界名画屏保，从文艺复兴到印象派，Ken Burns 缩放平移过渡，适配 4K 大屏' },
+  'screensaver-landscape': { en: 'Landscape Screensaver', zh: '风景如画屏保', enDesc: 'Breathtaking nature landscape screensaver with mountains, oceans, forests, deserts and waterfalls in 4K', zhDesc: '震撼自然风光屏保，涵盖山川、海洋、森林、沙漠和瀑布，4K 画质，自动亮度调节' },
+  'screensaver-anime': { en: 'Anime World Screensaver', zh: '动漫世界屏保', enDesc: 'Vibrant anime scenery screensaver featuring Studio Ghibli and Makoto Shinkai inspired landscapes', zhDesc: '动漫主题屏保，宫崎骏与新海诚风格场景，柔和溶解过渡，全年龄友好' },
+  'screensaver-funny': { en: 'Funny Vibes Screensaver', zh: '搞笑趣图屏保', enDesc: 'Wholesome memes, funny animal photos, clever puns and humorous comics — family-friendly and copyright-free', zhDesc: '温馨搞笑屏保，萌宠趣图、机智段子、幽默漫画，全年龄友好、无版权问题' },
+  'level-runner': { en: 'Level Runner Challenge', zh: '闯关大挑战', enDesc: '10 increasingly difficult reaction game levels — Level 1 is easy, Level 10 (The Wall) is brutally hard. Beat them all!', zhDesc: '10 关难度递增的反应力游戏，第 1 关轻松上手，第 10 关（绝望之墙）难到崩溃，你能通关吗？' },
+  'puzzle-master': { en: 'Puzzle Maze Master', zh: '益智数字迷宫', enDesc: '20 levels of brain-teasing puzzles from simple pattern matching to brutal combinatorial challenges with star ratings', zhDesc: '20 关烧脑解谜，从简单图形匹配到地狱级组合谜题，三星评级让你反复挑战' },
+  'daily-ledger': { en: 'Daily Expense Ledger', zh: '每日记账本', enDesc: 'Categorized expense tracking with monthly budgets, pie charts, trend lines, and CSV export — all stored locally', zhDesc: '分类记账，每月预算可视进度条、饼图和趋势图分析，支持 CSV 导出，数据本地存储' },
+  'habit-forge': { en: 'Habit Forge', zh: '习惯锻造机', enDesc: 'Build daily habits with streak tracking, strength meter, weekly charts, and morning/evening routine templates', zhDesc: '养成每日好习惯，连续打卡日历、习惯强度表、每周完成率图表，还能一键套用早晚例程模板' },
+  'water-reminder': { en: 'Water Reminder', zh: '喝水小助手', enDesc: 'Hydration tracker with daily goal, smart interval reminders, progress ring, and weekly trend charts', zhDesc: '每日饮水追踪，智能间隔提醒，进度圆环动画，周趋势图，帮你养成喝水好习惯' },
+  'weight-tracker': { en: 'Weight Tracker', zh: '体重管理师', enDesc: 'Weight, BMI, and body fat tracking with trend charts, goal setting, and milestone celebrations', zhDesc: '体重、BMI、体脂率追踪，平滑趋势图，目标设定与里程碑庆祝，长期管理身材' },
+  'reading-list': { en: 'Reading List', zh: '阅读清单', enDesc: 'Book tracking with categories, reading progress, ratings, notes, yearly reading goals, and stats dashboard', zhDesc: '书籍管理，分类/进度/评分/笔记，年度阅读目标，统计面板，培养阅读习惯' },
+  'workout-log': { en: 'Workout Log', zh: '健身记录', enDesc: 'Log exercises with sets, reps, weight, and duration. Track progressive overload with charts and workout templates', zhDesc: '记录每组训练（动作/组数/次数/重量），渐进超负荷图表，训练模板，健身人士必备' },
+  'sleep-tracker': { en: 'Sleep Tracker', zh: '睡眠记录', enDesc: 'Log bedtime and wake time, track sleep quality, consistency, and debt with trend charts and reminders', zhDesc: '记录入睡/起床时间，追踪睡眠质量、作息规律性和睡眠负债，趋势图表助你改善睡眠' },
+  'personal-journal': { en: 'Personal Journal', zh: '个人日记', enDesc: 'Private daily journal with mood tracking, calendar heatmap, search, and yearly summary for self-reflection', zhDesc: '私密日记，心情选择、日历热力图、历史搜索、年度总结，记录每一天的成长' }
+};
+function seedName(a) { const s = SEED_LOC[a.id]; if (!s) return a.name; return currentLang === 'zh-CN' ? s.zh : s.en; }
+function seedDesc(a) { const s = SEED_LOC[a.id]; if (!s) return a.description; return currentLang === 'zh-CN' ? s.zhDesc : s.enDesc; }
+// Normalize legacy (pre-i18n) platform names stored in old databases to the current English values.
+const PLAT_MAP = { '网页': 'Web', '手机': 'Mobile', '电脑': 'Desktop', '笔记本': 'Laptop', '平板': 'Tablet', '车机': 'Car', '电视盒': 'TV Box', '鸿蒙': 'HarmonyOS' };
+function normPlat(p) { return PLAT_MAP[p] || p; }
+function t(key, vars) {
+  let s = currentLang === 'zh-CN' ? (I18N_ZH[key] || key) : key;
+  if (vars) for (const k in vars) s = s.split('{{' + k + '}}').join(vars[k]);
+  return s;
+}
+function setLang(l) {
+  if (!SUPPORTED_LANGS.includes(l)) return;
+  currentLang = l;
+  localStorage.setItem('aiapp_lang', l);
+  document.documentElement.lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === l));
+  refreshViews();
+}
+function applyStaticI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+  document.querySelectorAll('[data-i18n-t]').forEach(el => { el.title = t(el.getAttribute('data-i18n-t')); });
+}
+function refreshViews() {
+  applyStaticI18n();
+  // Rebuild template mini buttons and category selects with the current language
+  const tpl = $('tplMini'); if (tpl) tpl.innerHTML = '';
+  loadTplMini();
+  const catSel = { gen: '', pub: '' };
+  ['genCategory', 'pubCategory'].forEach(id => {
+    const sel = $(id); if (!sel) return;
+    if (id === 'genCategory') catSel.gen = sel.value; else catSel.pub = sel.value;
+    while (sel.options.length > 1) sel.remove(1);
+  });
+  populateCategorySelects();
+  if (catSel.gen) $('genCategory').value = catSel.gen;
+  if (catSel.pub) $('pubCategory').value = catSel.pub;
+  loadMarket();
+  if (currentUser && currentView === 'myapps') loadMyApps();
+  renderAuthUI();
+  if (currentAppId && _appData) openApp(currentAppId);
+}
+
+
+// ====== State ======
+let templates = [];
+let marketApps = [];       // public market apps
+let myApps = [];           // my apps (owned + launched)
+let myOwned = new Set();   // app ids in my apps that I own (the rest were launched and are uninstallable)
+let availFilter = 'available';   // market availability filter 'available' | 'unavailable'
+let tagFilter = 'all';
+let currentPlatforms = []; // auto-detected current platforms
+let currentView = 'home'; // 'home' | 'market' | 'myapps'
+let currentAppId = null;
+let backgroundApps = [];
+let genMode = 'new';       // 'new' | 'update'
+let pendingApp = null;     // the most recently generated app
+
+// ====== App categories (must match the backend APP_CATEGORIES) ======
+const APP_CATEGORIES = [
+  ['tool', 'Utilities'], ['office', 'Office'], ['entertainment', 'Entertainment'],
+  ['game', 'Games'], ['family', 'Family & Kids'], ['life', 'Life & Health'],
+  ['industry', 'Industry'], ['other', 'Other']
+];
+const CAT_NAMES = Object.fromEntries(APP_CATEGORIES);
+// Categories requiring manual review (tool/office auto-approve)
+const CAT_REVIEW = ['entertainment', 'game', 'family', 'life', 'industry', 'other'];
+
+function populateCategorySelects() {
+  const g = $('genCategory'), p = $('pubCategory');
+  const opts = APP_CATEGORIES.map(([k, label]) => `<option value="${k}">${t(label)}</option>`).join('');
+  if (g) g.insertAdjacentHTML('beforeend', opts);
+  if (p) p.innerHTML = opts;
+}
+
+function onCategoryAuto() {
+  const cat = $('genCategory').value;
+  const hint = $('genCatHint');
+  if (!hint) return;
+  if (!cat) { hint.textContent = t('Category auto-derived from template'); return; }
+  hint.textContent = CAT_REVIEW.includes(cat)
+    ? t('This category requires manual review; it enters the review queue after publishing')
+    : t('Tool / office categories auto-approve; publish directly after generation');
+}
+
+function catLabel(c) {
+  return t(CAT_NAMES[c] || 'Other');
+}
+
+const $ = id => document.getElementById(id);
+
+// ====== Auto-detect current platform ======
+function detectPlatforms() {
+  const ua = navigator.userAgent;
+  const isMobile = /Mobi|Android|iPhone|iPad|HarmonyOS/i.test(ua);
+  const w = window.innerWidth;
+  const platforms = [];
+  if (isMobile) {
+    platforms.push('Mobile');
+  } else if (w >= 1024) {
+    platforms.push('Desktop', 'Laptop');
+  } else {
+    platforms.push('Tablet');
+  }
+  platforms.push('Web');
+  if (/Macintosh|Mac OS/i.test(ua)) platforms.push('macOS');
+  if (/Windows/i.test(ua)) platforms.push('Windows');
+  if (/HarmonyOS/i.test(ua)) platforms.push('HarmonyOS');
+  return [...new Set(platforms)];
+}
+
+function supportsCurrent(a) {
+  return (a.platforms || []).some(p => currentPlatforms.includes(normPlat(p)));
+}
+
+// ====== View switching ======
+function setView(view) {
+  if (view === 'market') { openSysApp('market'); return; }
+  if (view === 'myapps') { openSysApp('myapps'); return; }
+  currentView = view;
+  $('viewHome').hidden = view !== 'home';
+  updateDockHighlight();
+  closeStartMenu();
+  clearShareParam();
+  if (view === 'home') renderHome();
+}
+
+// ====== System window: platform modules (App Market / My Apps) open as apps ======
+let _sysWinMax = false;
+let _sysApp = null;   // 'market' | 'myapps' | null
+
+function openSysApp(type) {
+  if (type === 'myapps' && !currentUser) { openLogin(); return; }
+  if ($('genWindow').classList.contains('show')) closeGenerator();
+  // 应用窗口开着时先最小化（保留在导航栏运行），再打开系统窗口
+  if ($('appWindow').classList.contains('show')) minimizeApp();
+  // 切换系统应用内容（viewMarket / viewMyApps 常驻 sysWinBody，仅切换显示，不做 DOM 移动）
+  $('viewMarket').hidden = type !== 'market';
+  $('viewMyApps').hidden = type !== 'myapps';
+  $('sysWinName').textContent = type === 'market' ? t('App Market') : t('My Apps');
+  _sysApp = type;
+  currentView = type; // 'market' | 'myapps'
+  $('sysWindow').classList.add('show');
+  if (!_sysWinMax) maximizeSysApp();
+  document.body.style.overflow = 'hidden';
+  updateDockHighlight();
+  // 刷新视图数据
+  if (type === 'market') { renderAvailBar(); renderMarketApps(); }
+  else { loadMyApps(); }
+}
+
+function minimizeSysApp() {
+  $('sysWindow').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function maximizeSysApp() {
+  _sysWinMax = !_sysWinMax;
+  $('sysWindow').classList.toggle('fully', _sysWinMax);
+  const btn = $('sysWinMaxBtn');
+  if (btn) {
+    btn.textContent = _sysWinMax ? '❐' : '□';
+    btn.title = _sysWinMax ? t('Restore window') : t('Maximize');
+  }
+}
+
+function closeSysApp() {
+  $('sysWindow').classList.remove('show');
+  document.body.style.overflow = '';
+  _sysApp = null;
+  // 关闭市场时重置搜索和分类筛选，下次打开显示全部应用
+  searchQuery = '';
+  tagFilter = 'all';
+  setView('home');
+}
+
+function updateDockHighlight() {
+  // 应用窗口打开时 dock-task 全部不亮（由应用任务图标高亮）；否则按当前视图高亮
+  const appActive = _activeAppId && $('appWindow').classList.contains('show');
+  const cur = appActive ? '' : (currentView === 'home' ? 'home' : currentView);
+  document.querySelectorAll('.dock-task').forEach(t =>
+    t.classList.toggle('on', t.dataset.view === cur));
+}
+
+// Remove ?app= from the URL so a refresh no longer reopens the shared app after navigating away.
+function clearShareParam() {
+  const u = new URL(location.href);
+  if (u.searchParams.has('app')) {
+    u.searchParams.delete('app');
+    history.replaceState({}, '', u.pathname + u.search + u.hash);
+  }
+}
+
+// ====== Start menu (expands from the dock) ======
+function toggleStartMenu() {
+  const m = $('startMenu');
+  m.hidden = !m.hidden;
+}
+function closeStartMenu() {
+  const m = $('startMenu'); if (m) m.hidden = true;
+}
+function smGo(view) {
+  if (view === 'myapps' && !currentUser) { openLogin(); return; }
+  // 应用窗口开着时先最小化（保留在导航栏运行），再切换视图/系统窗口
+  if ($('appWindow').classList.contains('show')) minimizeApp();
+  // 系统窗口（市场/我的应用）开着时，切换到首页先关闭它
+  if (view === 'home' && $('sysWindow').classList.contains('show')) {
+    closeSysApp();
+    return;
+  }
+  setView(view);
+}
+
+// ====== Settings ======
+function openSettings() {
+  closeStartMenu();
+  $('settingsModal').classList.add('show');
+}
+function closeSettings() {
+  $('settingsModal').classList.remove('show');
+}
+
+// ====== Home: Bing-style entrance / launchpad ======
+let searchQuery = '';           // market keyword search (from the home search box)
+
+const TEMPLATE_ICONS = {
+  todo: '✅', pomodoro: '🍅', 'memory-game': '🧠', 'image-filter': '🎨',
+  'tv-movies': '📺', minimal: '🧩', timestamp: '🕐', 'expense-book': '💰', 'money-calculator': '🧮',
+  'daily-weather': '🌦️', 'car-showroom': '🚗', gps: '📍', calculator: '🧮',
+  photos: '🖼️', note: '📝', tracker: '📊'
+};
+function appIcon(template) { return TEMPLATE_ICONS[template] || '🧩'; }
+
+function renderHome() {
+  const sub = $('heroSub');
+  const guide = $('loginGuide');
+  const body = $('homeBody');
+  if (currentUser) {
+    guide.hidden = true;
+    sub.textContent = t('Welcome back, {{name}} 👋', { name: currentUser.name }) + ' · ' + t('Click an icon to launch. Discover more in the App Market.');
+    body.innerHTML = `<div class="home-sec-title">${t('Your Apps')}</div>${launchpadHTML()}`;
+  } else {
+    guide.hidden = false;
+    sub.textContent = t('Your AI App Launchpad') + ' · ' + t('Browse apps, launch with one click, and collect them automatically. Sign in to start.');
+    body.innerHTML = `<div class="home-sec-title">${t('🔥 Featured Apps')}<span class="sub">${t('Search above, or browse the market below')}</span></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'app-grid';
+    const avail = marketApps.filter(supportsCurrent);
+    grid.innerHTML = avail.length
+      ? avail.map(a => cardHTML(a)).join('')
+      : `<div class="market-empty"><div class="big">📭</div><p>${t('No apps available on this device yet')}</p></div>`;
+    body.appendChild(grid);
+    body.insertAdjacentHTML('beforeend',
+      `<div class="home-sec-title"><span class="sub"><a href="javascript:setView('market')">${t('🌐 App Market')} →</a></span></div>`);
+  }
+}
+
+function launchpadHTML() {
+  if (!myApps.length) {
+    return `<div class="lp-empty"><div class="big">🪄</div><p>${t('No apps yet. Go to the App Market to instant-launch, or generate your first one.')}</p></div>`;
+  }
+  const tiles = myApps.map(a => `
+    <div class="lp-tile" onclick="openApp('${a.id}')" title="${esc(a.description || a.name)}">
+      <div class="lp-icon">${appIcon(a.template)}</div>
+      <div class="lp-name">${esc(a.name)}</div>
+    </div>`).join('');
+  return `<div class="lp-grid">${tiles}<div class="lp-tile lp-more" onclick="setView('market')"><div class="lp-icon">➕</div><div class="lp-name">${t('More Apps')}</div></div></div>`;
+}
+
+function renderHomeIfVisible() {
+  if (currentView === 'home') renderHome();
+}
+
+// Instant launch works without login; launching while signed in also collects the app into "My Apps".
+async function instantLaunch(id) {
+  await openApp(id);
+}
+
+function homeSearch() {
+  const q = $('homeSearchInput').value.trim();
+  searchQuery = q;
+  setView('market');
+  renderMarketApps();
+}
+
+function marketSearch() {
+  const q = $('marketSearchInput').value.trim();
+  searchQuery = q;
+  renderMarketApps();
+}
+
+function marketClearSearch() {
+  $('marketSearchInput').value = '';
+  searchQuery = '';
+  renderMarketApps();
+}
+
+function homeGenerate() {
+  if (!currentUser) { openLogin(); return; }
+  const desc = $('homeSearchInput').value.trim();
+  openGenerator();
+  if (desc) $('descInput').value = desc;
+  $('descInput').focus();
+}
+
+// ====== Generator (opens as an app window) ======
+let _genWinMax = false;
+function toggleGenerator() {
+  $('genWindow').classList.contains('show') ? closeGenerator() : openGenerator();
+}
+
+function openGenerator() {
+  // 生成器作为窗口打开：先最小化应用窗口、关闭系统窗口
+  if ($('appWindow').classList.contains('show')) minimizeApp();
+  if ($('sysWindow').classList.contains('show')) closeSysApp();
+  $('genWindow').classList.add('show');
+  if (!_genWinMax) maximizeGen();
+  document.body.style.overflow = 'hidden';
+  closeStartMenu();
+  $('genResult').innerHTML = '';
+  loadTplMini();
+  setMode('new');
+}
+
+function closeGenerator() {
+  $('genWindow').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function minimizeGen() {
+  $('genWindow').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function maximizeGen() {
+  _genWinMax = !_genWinMax;
+  $('genWindow').classList.toggle('fully', _genWinMax);
+  const btn = $('genWinMaxBtn');
+  if (btn) {
+    btn.textContent = _genWinMax ? '❐' : '□';
+    btn.title = _genWinMax ? t('Restore window') : t('Maximize');
+  }
+}
+
+function setMode(mode) {
+  genMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b =>
+    b.classList.toggle('on', b.dataset.mode === mode));
+  $('updateTarget').hidden = mode !== 'update';
+  $('genResult').innerHTML = '';
+  refreshUpdateSelect();
+  $('genWinName').textContent = mode === 'update' ? t('🔄 Update App') : t('✨ Generate App');
+}
+
+function refreshUpdateSelect() {
+  const sel = $('updateSelect');
+  sel.innerHTML = myApps.map(a =>
+    `<option value="${a.id}">${esc(a.name)} (v${a.version})</option>`).join('')
+    || '<option value="">' + t('(No app available)') + '</option>';
+}
+
+function setGenTarget(app) {
+  setMode('update');
+  const sel = $('updateSelect');
+  sel.value = app ? app.id : (myApps[0] && myApps[0].id || '');
+  $('descInput').value = app ? t('Reference "{{name}}" to improve this app: ', {name: app.name}) : '';
+}
+
+function loadTplMini() {
+  const c = $('tplMini');
+  if (c.children.length > 0) return;
+  templates.forEach(tpl => {
+    const btn = document.createElement('span');
+    btn.className = 'tpl-mini-btn' + (tpl.name === 'minimal' ? ' on' : '');
+    btn.textContent = t(TPL_TO_LABEL[tpl.name] || tpl.name);
+    btn.dataset.name = tpl.name;
+    btn.onclick = () => {
+      document.querySelectorAll('.tpl-mini-btn').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+    };
+    c.appendChild(btn);
+  });
+}
+
+function getSelectedTpl() {
+  const sel = document.querySelector('.tpl-mini-btn.on');
+  return sel ? sel.dataset.name : 'minimal';
+}
+
+// ====== Generate app (new / update) ======
+async function generateApp() {
+  const desc = $('descInput').value.trim();
+  if (!desc) { $('descInput').focus(); return; }
+  const btn = $('genSubmit');
+  const payload = {
+    description: desc,
+    template: getSelectedTpl(),
+    build: false,
+    mode: genMode,
+    category: $('genCategory').value || ''
+  };
+
+  if (genMode === 'update') {
+    const targetId = $('updateSelect').value;
+    if (!targetId) { $('genResult').innerHTML = t('✗ Please select the app to update first'); return; }
+    const target = myApps.find(a => a.id === targetId);
+    // Owner-approval for update confirmation
+    if (!confirm(t('Will update "{{name}}" based on your new description.\nA new version will be created (v{{ver}} -> v{{next}}) and will take effect after the owner (you) approves.\nContinue?', {name: target.name, ver: target.version, next: nextVer(target.version)}))) {
+      return;
+    }
+    payload.target_id = targetId;
+  }
+
+  btn.disabled = true; btn.textContent = t('Generating…');
+  $('genResult').innerHTML = '';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || t('Generation failed'));
+    pendingApp = data.app;
+    const isUpdate = genMode === 'update' && pendingApp;
+    $('genResult').innerHTML =
+      `<div style="color:var(--ok)">✓ ${isUpdate ? t('Updated to new version v{{ver}} (only visible to you)', {ver: pendingApp.version}) : t('New app created (only visible to you)')}</div>` +
+      `<div class="res-actions">
+        <button class="res-btn primary" onclick="usePendingApp()">${t('▶ Use Now')}</button>
+        <button class="res-btn" onclick="publishPendingApp()">${t('🚀 Publish to Market')}</button>
+        ${isUpdate ? '<button class="res-btn" onclick="goToMyApps()">' + t('View My Apps') + '</button>' : ''}
+      </div>`;
+    closeGenerator();
+    setView('myapps');
+    await loadMyApps();
+  } catch (e) {
+    $('genResult').innerHTML = '✗ ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = t('✨ Generate');
+  }
+}
+
+function nextVer(v) {
+  const p = String(v).split('.').map(Number);
+  p[2] = (p[2] || 0) + 1;
+  return p.join('.');
+}
+
+function usePendingApp() { if (pendingApp) openApp(pendingApp.id); }
+function publishPendingApp() { if (pendingApp) openPublish(pendingApp.id); }
+function goToMyApps() { setView('myapps'); }
+
+// ====== Load market and my apps ======
+async function loadMarket() {
+  try {
+    const res = await fetch('/api/market');
+    const data = await res.json();
+    marketApps = data.apps || [];
+    renderAvailBar();
+    renderTagBar(data.tags);
+    renderMarketApps();
+    renderHomeIfVisible();
+  } catch (e) {
+    $('marketGrid').innerHTML = `<div class="market-empty"><div class="big">⚠️</div><p>${t('Failed to load: {{msg}}', {msg: e.message})}</p></div>`;
+  }
+}
+
+async function loadMyApps() {
+  try {
+    const res = await fetch('/api/my-apps');
+    const data = await res.json();
+    myApps = data.apps || [];
+    myOwned = new Set(data.mine || []);
+    refreshUpdateSelect();
+    renderMyApps();
+    renderHomeIfVisible();
+  } catch (e) { /* ignore */ }
+}
+
+// ====== Market filtering ======
+function renderAvailBar() {
+  const bar = $('availBar');
+  const tag = currentPlatforms.includes('Car') ? 'Car'
+    : currentPlatforms.includes('Mobile') ? 'Mobile'
+    : currentPlatforms.includes('Tablet') ? 'Tablet' : 'Desktop';
+  bar.innerHTML = `
+    <span class="current-device">${t('Current device: ')}<span class="dev-badge">${t(tag)}</span></span>
+    <span class="avail-switch">
+      <button class="avail-btn ${availFilter === 'available' ? 'on' : ''}" data-avail="available">${t('✅ Available Now')}</button>
+      <button class="avail-btn ${availFilter === 'unavailable' ? 'on warn' : ''}" data-avail="unavailable">${t('🚫 Other Platforms')}</button>
+    </span>
+  `;
+  bar.querySelectorAll('.avail-btn').forEach(btn => {
+    btn.onclick = () => {
+      availFilter = btn.dataset.avail;
+      renderAvailBar();
+      renderMarketApps();
+    };
+  });
+}
+
+function renderTagBar(tags) {
+  const bar = $('filterBar');
+  let html = '<span class="label">' + t('Category filter') + '</span>';
+  ['all', ...tags].forEach(tag => {
+    const on = tag === tagFilter ? ' on' : '';
+    html += `<span class="filter-chip tag${on}" data-t="${tag}">${tag === 'all' ? t('All') : esc(tag)}</span>`;
+  });
+  bar.innerHTML = html;
+  bar.querySelectorAll('.filter-chip[data-t]').forEach(c => {
+    c.onclick = () => {
+      tagFilter = c.dataset.t;
+      renderTagBar(tags);
+      renderMarketApps();
+    };
+  });
+}
+
+function renderMarketApps() {
+  // Sync market search input with current searchQuery
+  const msInput = $('marketSearchInput');
+  if (msInput) msInput.value = searchQuery;
+  const clearBtn = $('marketClearBtn');
+  if (clearBtn) clearBtn.hidden = !searchQuery;
+  const grid = $('marketGrid');
+  let filtered = availFilter === 'available'
+    ? marketApps.filter(supportsCurrent)
+    : marketApps.filter(a => !supportsCurrent(a));
+  if (tagFilter !== 'all') filtered = filtered.filter(a => a.tags.includes(tagFilter));
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(a =>
+      (a.name + ' ' + (a.description || '') + ' ' + (a.tags || []).join(' ')).toLowerCase().includes(q));
+  }
+  $('marketCount').textContent = t('Market {{n}} apps', {n: filtered.length});
+
+  if (filtered.length === 0) {
+    if (searchQuery) {
+      grid.innerHTML = `<div class="market-empty"><div class="big">🔍</div>
+        <p>${t('No apps found for "{{q}}"', {q: esc(searchQuery)})}<br>
+        <a href="javascript:onGenClick()" style="color:var(--accent);text-decoration:underline">${t('✨ Generate this app now')}</a></p></div>`;
+    } else {
+      const tip = availFilter === 'available'
+        ? t('All apps that work on this device are here<br>Click "✨ Generate App" at the top to make your own')
+        : t('These apps run on other platforms<br>Switch back to "Available Now" to see what works on this device');
+      grid.innerHTML = `<div class="market-empty"><div class="big">📭</div><p>${tip}</p></div>`;
+    }
+    return;
+  }
+
+  grid.innerHTML = filtered.map(a => cardHTML(a, a.owner)).join('');
+}
+
+function netBadge(a) {
+  const net = a.net === 'online' ? 'online' : 'local';
+  const cls = net === 'online' ? 'online' : 'local';
+  const icon = net === 'online' ? '🌐' : '💾';
+  return `<span class="net-badge ${cls}">${icon} ${t(net)}</span>`;
+}
+
+// Stable random color for an app icon (derived from id, so the same app always keeps its color).
+const ICON_COLORS = ['#d97757', '#5b8c5a', '#4a7fb5', '#9b6bae', '#c98a3d', '#3d9a99', '#b5544f', '#6b7bb0', '#a06c9c', '#7a8f3f', '#3f7fbf', '#b56b2e'];
+function iconColor(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return ICON_COLORS[h % ICON_COLORS.length];
+}
+// App-icon tile: the first character of the display name on a colored rounded square.
+function appIconHTML(a) {
+  const name = seedName(a) || a.name || '';
+  const ch = (name.trim()[0] || '?').toUpperCase();
+  return `<span class="app-icon" style="background:${iconColor(a.id)}">${esc(ch)}</span>`;
+}
+
+function cardHTML(a) {
+  const tags = (a.tags || []).map(t => `<span class="app-tag">${t}</span>`).join('');
+  const platforms = (a.platforms || []).map(p => `<span class="plat-badge">${normPlat(p)}</span>`).join('');
+  const canRun = supportsCurrent(a);
+  const ver = `<span class="ver-badge">v${a.version}</span>`;
+  return `<div class="app-card" onclick="openApp('${a.id}')">
+    <div class="app-body">
+      <div class="app-head">
+        ${appIconHTML(a)}
+        <div>
+          <div class="app-name">${esc(seedName(a))}${canRun ? '' : '<span class="not-sup" title="' + t('Not supported on this device') + '">⛔</span>'}${ver}</div>
+          <div class="app-meta-line"><span class="cat-badge">${catLabel(a.category)}</span>${appShareBadge(a)}</div>
+        </div>
+      </div>
+      <div class="app-desc">${esc(seedDesc(a))}</div>
+      <div class="app-net">${netBadge(a)}</div>
+      <div class="app-tags">${tags}</div>
+      <div class="app-platforms">${platforms}</div>
+      <button class="launch-btn lg" onclick="event.stopPropagation(); instantLaunch('${a.id}')">${t('⚡ Instant Launch')}</button>
+    </div>
+  </div>`;
+}
+
+// ====== My Apps ======
+function appStatusBadge(a) {
+  if (a.status === 'published') return '<span class="vis-badge public">' + t('Published') + '</span>';
+  if (a.status === 'reviewing') return '<span class="vis-badge review">' + t('Under Review') + '</span>';
+  if (a.status === 'disabled') return '<span class="vis-badge danger">' + t('Disabled') + '</span>';
+  return '<span class="vis-badge private">' + t('Draft') + '</span>';
+}
+
+function appShareBadge(a) {
+  if (a.share === 'public') return '<span class="share-badge pub">' + t('🌐 Public') + '</span>';
+  if (a.share === 'org') return '<span class="share-badge org">' + t('🏢 Org') + '</span>';
+  return '<span class="share-badge">' + t('🔒 Private') + '</span>';
+}
+
+// Reliable auto-copy: Clipboard API first, hidden-textarea execCommand fallback (never opens a prompt).
+function copyText(text) {
+  return new Promise((resolve) => {
+    const done = (ok) => { toast(ok ? t('✓ Link copied') : t('Copy failed')); resolve(ok); };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => done(true)).catch(() => done(fallbackCopy(text)));
+    } else {
+      done(fallbackCopy(text));
+    }
+  });
+}
+function fallbackCopy(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch (e) { return false; }
+}
+let _toastTimer = null;
+function toast(msg, ok = true) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  el.style.background = ok ? 'rgba(20,20,19,.85)' : 'rgba(179,65,44,.92)';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+function copyShareLink(id) {
+  const url = location.origin + location.pathname + '?app=' + encodeURIComponent(id);
+  copyText(url);
+}
+
+function renderMyApps() {
+  const grid = $('myGrid');
+  if (myApps.length === 0) {
+    grid.innerHTML = `<div class="market-empty"><div class="big">👤</div><p>${t('No apps yet<br>Apps you use via "⚡ Instant Launch" in the market are collected here automatically<br>You can also click "✨ Generate App" at the top to create your own')}</p></div>`;
+    return;
+  }
+  grid.innerHTML = myApps.map(a => {
+    const tags = (a.tags || []).map(t => `<span class="app-tag">${t}</span>`).join('');
+    const platforms = (a.platforms || []).map(p => `<span class="plat-badge">${normPlat(p)}</span>`).join('');
+    const status = appStatusBadge(a);
+    const share = appShareBadge(a);
+    const isMine = myOwned.has(a.id);
+    const publishBtn = (a.status === 'published' || a.status === 'reviewing')
+      ? '<button class="my-btn" onclick="event.stopPropagation(); openPublish(\'' + a.id + '\')">' + t('📄 Publish Settings') + '</button>'
+      : '<button class="my-btn publish" onclick="event.stopPropagation(); openPublish(\'' + a.id + '\')">' + t('🚀 Publish') + '</button>';
+    // Apps you own: update / publish / share / delete; apps you only launched: uninstall
+    const manageBtns = isMine ? `
+      <button class="my-btn" onclick="event.stopPropagation(); openUpdate('${a.id}')">${t('🔄 Update')}</button>
+      ${publishBtn}
+      <button class="my-btn" onclick="event.stopPropagation(); copyShareLink('${a.id}')">${t('🔗 Share')}</button>
+      <button class="my-btn danger" onclick="event.stopPropagation(); deleteApp('${a.id}')">${t('🗑 Delete')}</button>` : '';
+    const uninstallBtn = isMine ? '' : `<button class="my-btn uninstall" onclick="event.stopPropagation(); uninstallApp('${a.id}')">${t('🗑 Uninstall')}</button>`;
+    return `<div class="app-card" onclick="openApp('${a.id}')">
+      <div class="app-body">
+        <div class="app-head">
+          ${appIconHTML(a)}
+          <div>
+            <div class="app-name">${esc(seedName(a))} ${status}<span class="ver-badge">v${a.version}</span></div>
+            <div class="app-meta-line">${share}<span class="cat-badge">${catLabel(a.category)}</span>${isMine ? '' : '<span class="vis-badge private">' + t('Collected') + '</span>'}</div>
+          </div>
+        </div>
+        <div class="app-desc">${esc(seedDesc(a))}</div>
+        <div class="app-net">${netBadge(a)}</div>
+        <div class="app-tags">${tags}</div>
+        <div class="app-platforms">${platforms}</div>
+        <div class="my-actions">
+          <button class="my-btn launch" onclick="event.stopPropagation(); instantLaunch('${a.id}')">${t('⚡ Instant Launch')}</button>
+          ${manageBtns}
+          ${uninstallBtn}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openUpdate(id) {
+  const app = myApps.find(a => a.id === id);
+  openGenerator();
+  setGenTarget(app);
+  $('descInput').focus();
+  $('genWindow').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function deleteApp(id) {
+  const app = getAppById(id);
+  const name = app ? app.name : id;
+  if (!confirm(t('Delete app "{{name}}"?\n\nDeleting will also permanently remove all data this app saved on this device (todos, lists, best records, etc.), and it cannot be recovered.\nIf you need to keep the data, back it up first.', {name: name}))) return;
+  const res = await fetch('/api/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  });
+  const data = await res.json();
+  if (!data.ok) { alert(data.error || t('Delete failed')); return; }
+  if (app) { try { await clearLocalAppData(app); } catch (e) {} }
+  await loadMyApps();
+  loadMarket();
+}
+
+// Uninstall app: only for apps "launched but not owned". Removes the launch record and deletes local data.
+async function uninstallApp(id) {
+  const app = getAppById(id);
+  const name = app ? app.name : id;
+  if (!confirm(t('Uninstall app "{{name}}"?\n\nUninstalling will also permanently delete all data this app saved on this device (todos, lists, best records, etc.), and it cannot be recovered.\nIf you need to keep the data, back up the storage first.', {name: name}))) return;
+  const res = await fetch('/api/uninstall', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  });
+  const data = await res.json();
+  if (!data.ok) { alert(data.error || t('Uninstall failed')); return; }
+  if (app) { try { await clearLocalAppData(app); } catch (e) {} }
+  await loadMyApps();
+  loadMarket();
+}
+
+// Clean up all data saved by an app on this device (SQLite records for this app_id + each template's local storage keys)
+async function clearLocalAppData(app) {
+  const id = app.id;
+  // 1) SQLite: delete all records of this app (app_id) (todos etc.)
+  try {
+    const db = await getDB();
+    db.run('DELETE FROM todos WHERE app_id=?', [id]);
+    await persistDB(db);
+  } catch (e) {}
+  // 2) IndexedDB keys: family movie list tv_<appId>
+  try { await idbDelKey('tv_' + id); } catch (e) {}
+  // 3) localStorage: kids memory match best record
+  if (app.template === 'memory-game') {
+    try { localStorage.removeItem('mem_best'); } catch (e) {}
+  }
+}
+
+// ====== Publish modal ======
+const ALL_PLATS = ['Web', 'Mobile', 'Desktop', 'macOS', 'Windows', 'HarmonyOS', 'Car', 'TV Box'];
+let publishId = null;
+
+function openPublish(id) {
+  const app = (myApps.find(a => a.id === id)) || (marketApps.find(a => a.id === id));
+  if (!app) return;
+  publishId = id;
+  $('pubName').value = app.name || '';
+  $('pubDesc').value = app.description || '';
+  $('pubCategory').value = app.category || '';
+  $('pubTags').value = (app.tags || []).join(', ');
+  $('pubPlatforms').value = (app.platforms || ALL_PLATS).join(', ');
+  const share = app.share === 'org' ? 'org' : 'public';
+  document.querySelectorAll('input[name="pubShare"]').forEach(r => {
+    r.checked = (r.value === share);
+  });
+  $('pubKind').value = app.kind === 'web' ? 'web' : 'app';
+  $('pubHideBrand').checked = !!app.hide_branding;
+  $('pubModal').classList.add('show');
+}
+
+function closePublish() {
+  $('pubModal').classList.remove('show');
+  publishId = null;
+}
+
+async function confirmPublish() {
+  const name = $('pubName').value.trim();
+  if (!name) { alert(t('Please enter an app name')); return; }
+  const tags = $('pubTags').value.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+  const platforms = $('pubPlatforms').value.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+  const shareSel = document.querySelector('input[name="pubShare"]:checked');
+  const body = {
+    id: publishId,
+    name,
+    description: $('pubDesc').value.trim(),
+    tags,
+    platforms,
+    category: $('pubCategory').value || '',
+    share: shareSel ? shareSel.value : 'public',
+    kind: $('pubKind').value,
+    hide_branding: $('pubHideBrand').checked
+  };
+  const res = await fetch('/api/publish', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (!data.ok) { alert(data.error || t('Publish failed')); return; }
+  closePublish();
+  await loadMyApps();
+  loadMarket();
+}
+
+// ====== Open app ======
+let _appData = null;
+
+function getAppById(id) {
+  return myApps.find(a => a.id === id)
+    || marketApps.find(a => a.id === id)
+    || null;
+}
+
+async function openApp(id) {
+  currentAppId = id;
+  try {
+    const res = await fetch(`/api/app/${id}?lang=${currentLang}`);
+    const data = await res.json();
+    if (!data.ok || !data.app) throw new Error(data.error || t('App not found'));
+    _appData = data;
+    showWindow(data.app, data.mock_content || '');
+  } catch (e) {
+    alert(t('Failed to open: {{msg}}', {msg: e.message}));
+  }
+}
+
+function showWindow(app, content) {
+  if ($('sysWindow').classList.contains('show')) closeSysApp();
+  if ($('genWindow').classList.contains('show')) closeGenerator();
+  // 更新 URL 为 ?app=<id>，方便收藏书签后下次直接打开
+  const u = new URL(location.href);
+  u.searchParams.set('app', app.id);
+  history.replaceState({}, '', u.pathname + u.search + u.hash);
+  document.title = seedName(app) + ' · aiapp';
+  $('winName').innerHTML = appIconHTML(app) + ' ' + esc(seedName(app));
+  $('winVersion').textContent = 'v' + app.version;
+  $('winPlatforms').innerHTML = (app.platforms || []).map(p => `<span class="plat-badge">${normPlat(p)}</span>`).join('');
+  $('winBody').innerHTML = renderAppBody(app);
+  const isMine = !!currentUser && app.owner === currentUser.id;
+  $('winOwner').innerHTML =
+    `<span>${t('Owner: ')}${(currentUser && app.owner === currentUser.id) ? t('Me') : esc(app.owner)}</span>` +
+    appStatusBadge(app) +
+    appShareBadge(app);
+  // Action buttons: your own apps can be updated; official/other apps can only be used as a reference for a new one
+  if (isMine) {
+    $('winActionBtns').innerHTML =
+      `<button class="custom-gen" onclick="copyShareLink('${app.id}')">${t('🔗 Share Link')}</button>
+       <button class="custom-gen" onclick="updateThisApp()">${t('🔄 Update This App')}</button>
+       <button class="custom-gen" style="background:var(--panel-2);color:var(--text);border:1px solid var(--border)" onclick="customGenerate()">${t('Generate a New App Based on This One')}</button>`;
+  } else {
+    $('winActionBtns').innerHTML =
+      `<button class="custom-gen" onclick="copyShareLink('${app.id}')">${t('🔗 Share Link')}</button>
+       <button class="custom-gen" onclick="customGenerate()">${t('Generate a New App Based on This One')}</button>`;
+  }
+  $('appWindow').classList.add('show');
+  if (!_winMax) maximizeApp();   // 启动应用后默认最大化
+  document.body.style.overflow = 'hidden';
+  // 启动过的应用始终显示在底部导航栏（即使没有最小化），可随时切换回来
+  if (!backgroundApps.find(a => a.id === app.id)) {
+    backgroundApps.push({ id: app.id, name: app.name, template: app.template });
+  }
+  _activeAppId = app.id;
+  updateDockHighlight();   // 打开应用后 dock-task 不再高亮固定图标，改由应用任务图标高亮
+  if (app.template === 'todo' && document.getElementById('todoList')) initTodo(app.id);
+  if (app.template === 'pomodoro' && document.getElementById('pmTime')) { pm.reset(); refreshPomodoroUi(); renderPomodoroLog(); }
+  if (app.template === 'memory-game' && document.getElementById('memGrid')) memNew();
+  if (app.template === 'tv-movies' && document.getElementById('tvList')) renderTv();
+  renderTaskbar();
+}
+
+// ====== Interactive app UI (real operable UI rendered per template) ======
+// Note: this runs frontend-implemented components, not the generated MoonBit program itself.
+function renderAppBody(app) {
+  if (app.template === 'todo') return renderTodo(app);
+  if (app.template === 'image-filter') return renderImageFilter(app);
+  if (app.template === 'pomodoro') return renderPomodoro(app);
+  if (app.template === 'memory-game') return renderMemoryGame(app);
+  if (app.template === 'tv-movies') return renderTvMovies(app);
+  if (app.template === 'timestamp') return renderTimestamp(app);
+  return renderMinimal(app);
+}
+
+function renderMinimal(app) {
+  const desc = seedDesc(app) || t('(No description yet)');
+  return `<div class="app-ui">
+    <div class="app-mini-card">
+      <h3>${esc(seedName(app))}</h3>
+      <p>${t('Type: ')}${esc(app.template || 'minimal')}</p>
+      <p>${t('Version: ')}v${esc(app.version || '1.0.0')}</p>
+      <p>${esc(desc)}</p>
+    </div>
+  </div>`;
+}
+
+// ---- Todo ----
+function renderTodo(app) {
+  return `<div class="app-ui">
+    <div class="todo-add">
+      <input id="todoInput" placeholder="${t('Add a todo item…')}" onkeydown="if(event.key==='Enter')todoAdd()" />
+      <button onclick="todoAdd()">${t('Add')}</button>
+    </div>
+    <ul class="todo-list" id="todoList"><li class="todo-item"><span class="todo-text">${t('⏳ Loading from local SQLite…')}</span></li></ul>
+  </div>`;
+}
+
+// ---- Local SQLite (sql.js) persistence: data stored in browser IndexedDB, survives reopen ----
+let _sqlReady = null;
+function getDB() {
+  if (!_sqlReady) {
+    // Load the SQLite WASM runtime (/static/sql-wasm.wasm is served by the backend)
+    _sqlReady = initSqlJs({ locateFile: (f) => '/static/' + f }).then((SQL) => {
+      return idbGetBytes('aiapp_local_db').then((bytes) => {
+        const db = bytes ? new SQL.Database(new Uint8Array(bytes)) : new SQL.Database();
+        db.run('CREATE TABLE IF NOT EXISTS todos (app_id TEXT, id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, done INTEGER)');
+        return db;
+      });
+    });
+  }
+  return _sqlReady;
+}
+function persistDB(db) { return idbSetBytes('aiapp_local_db', db.export()); }
+
+async function initTodo(appId) {
+  const list = document.getElementById('todoList');
+  if (!list) return;
+  try {
+    const db = await getDB();
+    const stmt = db.prepare('SELECT id,title,done FROM todos WHERE app_id=? ORDER BY id');
+    stmt.bind([appId]);
+    const rows = [];
+    while (stmt.step()) rows.push(stmt.getAsObject());
+    stmt.free();
+    list.innerHTML = rows.map((r) => todoItemHtml(r.id, r.title, r.done === 1)).join('');
+  } catch (e) {
+    list.innerHTML = '<li class="todo-item"><span class="todo-text">' + t('Failed to load: {{msg}}', {msg: esc(e.message)}) + '</span></li>';
+  }
+}
+function todoItemHtml(id, title, done) {
+  return `<li class="todo-item${done ? ' done' : ''}" data-id="${id}">
+    <input type="checkbox" ${done ? 'checked' : ''} onchange="todoToggle(event, ${id})" />
+    <span class="todo-text">${esc(title)}</span>
+    <button class="todo-del" onclick="todoDel(event, ${id})">✕</button>
+  </li>`;
+}
+async function todoAdd() {
+  const inp = document.getElementById('todoInput');
+  const list = document.getElementById('todoList');
+  if (!inp || !list) return;
+  const v = inp.value.trim();
+  if (!v) return;
+  try {
+    const db = await getDB();
+    db.run('INSERT INTO todos(app_id,title,done) VALUES(?,?,0)', [currentAppId, v]);
+    await persistDB(db);
+    const id = db.exec('SELECT last_insert_rowid()')[0].values[0][0];
+    list.insertAdjacentHTML('beforeend', todoItemHtml(id, v, false));
+    inp.value = '';
+  } catch (e) { alert(t('Add failed: {{msg}}', {msg: e.message})); }
+}
+async function todoToggle(e, id) {
+  const li = e.target.closest('.todo-item');
+  if (li) li.classList.toggle('done');
+  const done = li.classList.contains('done') ? 1 : 0;
+  try {
+    const db = await getDB();
+    db.run('UPDATE todos SET done=? WHERE app_id=? AND id=?', [done, currentAppId, id]);
+    await persistDB(db);
+  } catch (e) {}
+}
+async function todoDel(e, id) {
+  const li = e.target.closest('.todo-item');
+  if (li) li.remove();
+  try {
+    const db = await getDB();
+    db.run('DELETE FROM todos WHERE app_id=? AND id=?', [currentAppId, id]);
+    await persistDB(db);
+  } catch (e) {}
+}
+
+// ---- IndexedDB persistence (stores the SQLite database bytes) ----
+function idbGetBytes(key) {
+  return new Promise((resolve, reject) => {
+    const open = indexedDB.open('aiapp', 1);
+    open.onupgradeneeded = () => open.result.createObjectStore('kv');
+    open.onsuccess = () => {
+      const tx = open.result.transaction('kv', 'readonly');
+      const get = tx.objectStore('kv').get(key);
+      get.onsuccess = () => resolve(get.result || null);
+      get.onerror = () => reject(get.error);
+    };
+    open.onerror = () => reject(open.error);
+  });
+}
+function idbSetBytes(key, bytes) {
+  return new Promise((resolve, reject) => {
+    const open = indexedDB.open('aiapp', 1);
+    open.onupgradeneeded = () => open.result.createObjectStore('kv');
+    open.onsuccess = () => {
+      const tx = open.result.transaction('kv', 'readwrite');
+      tx.objectStore('kv').put(bytes, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    };
+    open.onerror = () => reject(open.error);
+  });
+}
+function idbDelKey(key) {
+  return new Promise((resolve, reject) => {
+    const open = indexedDB.open('aiapp', 1);
+    open.onupgradeneeded = () => open.result.createObjectStore('kv');
+    open.onsuccess = () => {
+      const tx = open.result.transaction('kv', 'readwrite');
+      tx.objectStore('kv').delete(key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    };
+    open.onerror = () => reject(open.error);
+  });
+}
+
+// ---- Image filter ----
+function renderImageFilter(app) {
+  return `<div class="app-ui">
+    <div class="img-filter">
+      <input type="file" id="imgInput" accept="image/*" onchange="imgLoad()" />
+      <canvas id="imgCanvas" width="320" height="200"></canvas>
+      <div class="filter-bar">
+        <button onclick="applyFilter('none')">${t('Original')}</button>
+        <button onclick="applyFilter('gray')">${t('Grayscale')}</button>
+        <button onclick="applyFilter('invert')">${t('Invert')}</button>
+        <button onclick="applyFilter('sepia')">${t('Sepia')}</button>
+      </div>
+    </div>
+  </div>`;
+}
+let _imgData = null;
+function imgLoad() {
+  const inp = document.getElementById('imgInput');
+  const canvas = document.getElementById('imgCanvas');
+  if (!inp || !canvas || !inp.files || !inp.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const ctx = canvas.getContext('2d');
+      const scale = Math.min(canvas.width / img.width, canvas.height / img.height, 1);
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      canvas.width = w; canvas.height = h;
+      ctx.drawImage(img, 0, 0, w, h);
+      _imgData = ctx.getImageData(0, 0, w, h);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(inp.files[0]);
+}
+function applyFilter(type) {
+  const canvas = document.getElementById('imgCanvas');
+  if (!canvas || !_imgData) { alert(t('Please pick an image first')); return; }
+  const ctx = canvas.getContext('2d');
+  const src = _imgData.data;
+  const out = ctx.createImageData(_imgData.width, _imgData.height);
+  const px = out.data;
+  for (let i = 0; i < src.length; i += 4) {
+    const r = src[i], g = src[i + 1], b = src[i + 2];
+    if (type === 'gray') { const v = (r + g + b) / 3; px[i] = px[i + 1] = px[i + 2] = v; }
+    else if (type === 'invert') { px[i] = 255 - r; px[i + 1] = 255 - g; px[i + 2] = 255 - b; }
+    else if (type === 'sepia') {
+      px[i] = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
+      px[i + 1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
+      px[i + 2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
+    } else { px[i] = r; px[i + 1] = g; px[i + 2] = b; }
+    px[i + 3] = 255;
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+// ---- Focus pomodoro ----
+function renderPomodoro(app) {
+  return `<div class="app-ui pomodoro">
+    <div class="pm-ring">
+      <div class="pm-time" id="pmTime">${esc(pm.formatTime(pm.duration))}</div>
+      <div class="pm-mode" id="pmMode">${t('Focus')}</div>
+      <div class="pm-progress"><div class="pm-fill" id="pmFill"></div></div>
+    </div>
+    <div class="pm-btns">
+      <button class="pm-btn" id="pmStart" onclick="pm.toggle()">${t('Start')}</button>
+      <button class="pm-btn" onclick="pm.reset()">${t('Reset')}</button>
+    </div>
+    <div class="pm-stats"><span id="pmToday">${t('Focus {{n}} sessions today', {n: 0})}</span></div>
+    <div class="pm-log" id="pmLog"></div>
+  </div>`;
+}
+let pm = {
+  duration: 25 * 60, remaining: 25 * 60, running: false, timer: null, mode: 'focus',
+  formatTime(s) { const m = Math.floor(s / 60); const ss = s % 60; return String(m).padStart(2, '0') + ':' + String(ss).padStart(2, '0'); },
+  next() { this.stopTimer(); this.mode = this.mode === 'focus' ? 'break' : 'focus'; this.duration = this.mode === 'focus' ? 25 * 60 : 5 * 60; this.remaining = this.duration; this.render(); },
+  toggle() {
+    if (this.running) { this.pause(); }
+    else if (this.remaining <= 0) { this.next(); this.start(); }
+    else { this.start(); }
+  },
+  start() {
+    if (this.running) return;
+    this.running = true;
+    document.getElementById('pmStart').textContent = t('Pause');
+    this.timer = setInterval(() => {
+      this.remaining--;
+      if (this.remaining <= 0) { this.remaining = 0; this.complete(); }
+      this.render();
+    }, 1000);
+  },
+  pause() { this.running = false; this.stopTimer(); document.getElementById('pmStart').textContent = t('Resume'); },
+  stopTimer() { if (this.timer) { clearInterval(this.timer); this.timer = null; } },
+  complete() {
+    this.stopTimer(); this.running = false;
+    const m = this.mode === 'focus' ? 'focus' : 'break';
+    addDailyStat(currentAppId, m);
+    if (this.mode === 'focus') refreshPomodoroUi();
+    this.next();
+    document.getElementById('pmStart').textContent = t('Start');
+    renderPomodoroLog();
+  },
+  reset() { this.stopTimer(); this.running = false; this.duration = 25 * 60; this.remaining = this.duration; this.mode = 'focus'; const el = document.getElementById('pmStart'); if (el) el.textContent = t('Start'); this.render(); renderPomodoroLog(); },
+  render() {
+    const timeEl = document.getElementById('pmTime'); if (timeEl) timeEl.textContent = pm.formatTime(this.remaining);
+    const mo = document.getElementById('pmMode'); if (mo) mo.textContent = this.mode === 'focus' ? t('Focus') : t('Break');
+    const f = document.getElementById('pmFill'); if (f) f.style.width = ((pm.duration - pm.remaining) / pm.duration * 100).toFixed(1) + '%';
+  }
+};
+function addDailyStat(appId, mode) {
+  idbGetJSON('pm_' + appId).then(d => {
+    const data = d || { list: [] };
+    const day = new Date().toISOString().slice(0, 10);
+    const found = data.list.find(x => x.day === day);
+    if (found) found[mode] = (found[mode] || 0) + 1; else data.list.push({ day, focus: mode === 'focus' ? 1 : 0, break: mode === 'break' ? 1 : 0 });
+    idbSetJSON('pm_' + appId, data);
+    refreshPomodoroUi();
+    renderPomodoroLog();
+  });
+}
+function refreshPomodoroUi() {
+  idbGetJSON('pm_' + currentAppId).then(d => {
+    const day = new Date().toISOString().slice(0, 10);
+    const today = d && d.list.find(x => x.day === day);
+    const el = document.getElementById('pmToday'); if (el) el.textContent = t('Focus {{n}} sessions today', {n: (today ? today.focus || 0 : 0)});
+  });
+}
+function renderPomodoroLog() {
+  const el = document.getElementById('pmLog');
+  if (!el) return;
+  idbGetJSON('pm_' + currentAppId).then(d => {
+    const list = (d && d.list) || [];
+    if (list.length === 0) { el.innerHTML = '<div class="pm-log-empty">' + t('Start a pomodoro!') + '</div>'; return; }
+    el.innerHTML = list.slice().reverse().slice(0, 7).map(x =>
+      `<div class="pm-log-item">${esc(x.day)}　${t('Focus {{n}} · Break {{m}}', {n: x.focus || 0, m: x.break || 0})}</div>`).join('');
+  });
+}
+
+// ---- Kids memory match ----
+function renderMemoryGame(app) {
+  const cards = buildCards();
+  return `<div class="app-ui memory">
+    <div class="mem-top">
+      <span>${t('Left')} <b id="memLeft">${cards.length}</b> ${t('cards')}</span>
+      <span>${t('Moves')} <b id="memMoves">0</b></span>
+      <span>${t('Best')} <b id="memBest">${esc(localStorage.getItem('mem_best') || '-')}</b></span>
+      <button class="mem-new" onclick="memNew()">${t('New')}</button>
+    </div>
+    <div class="mem-grid" id="memGrid">${cards.map((c, i) =>
+      `<div class="mem-card" data-i="${i}" onclick="memFlip(this)"><span class="mem-sym">${esc(c)}</span></div>`).join('')}
+    </div>
+    <div class="mem-done" id="memDone" hidden></div>
+  </div>`;
+}
+const MEM_SYMBOLS = ['🍎', '🍌', '🍇', '🍊', '🍓', '🥑', '🥝', '🍍'];
+let memState = null;
+function buildCards() {
+  const syms = MEM_SYMBOLS.slice(0, 6);
+  let arr = syms.concat(syms);
+  for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  return arr;
+}
+function memNew() {
+  const cards = buildCards();
+  memState = { moves: 0, open: null, lock: false, cards, matched: 0 };
+  const grid = document.getElementById('memGrid');
+  if (grid) grid.innerHTML = cards.map((c, i) => `<div class="mem-card" data-i="${i}" onclick="memFlip(this)"><span class="mem-sym">${esc(c)}</span></div>`).join('');
+  const left = document.getElementById('memLeft'); if (left) left.textContent = cards.length;
+  const mv = document.getElementById('memMoves'); if (mv) mv.textContent = '0';
+  const done = document.getElementById('memDone'); if (done) done.hidden = true;
+}
+function memFlip(card) {
+  if (!memState) memState = { moves: 0, open: null, lock: false, cards: buildCards(), matched: 0 };
+  if (memState.lock || card.classList.contains('on') || card.classList.contains('ok')) return;
+  card.classList.add('on');
+  const i = Number(card.dataset.i);
+  const sym = memState.cards[i];
+  if (memState.open === null) { memState.open = { i, sym, card }; return; }
+  memState.moves++;
+  const mv = document.getElementById('memMoves'); if (mv) mv.textContent = memState.moves;
+  if (memState.open.sym === sym) {
+    card.classList.add('ok'); memState.open.card.classList.add('ok');
+    memState.open = null; memState.matched += 2;
+    const left = document.getElementById('memLeft'); if (left) left.textContent = memState.cards.length - memState.matched;
+    if (memState.matched === memState.cards.length) finishMemoryGame(memState.moves);
+  } else {
+    memState.lock = true;
+    const prev = memState.open; memState.open = null;
+    setTimeout(() => { card.classList.remove('on'); prev.card.classList.remove('on'); memState.lock = false; }, 650);
+  }
+}
+function finishMemoryGame(moves) {
+  const bestText = localStorage.getItem('mem_best');
+  const best = bestText ? Number(bestText) : Infinity;
+  const b = document.getElementById('memBest'); if (b) b.textContent = bestText || '-';
+  const done = document.getElementById('memDone');
+  if (done) { done.hidden = false; done.textContent = moves < best ? t('🎉 New record!') : t('🎉 Done!'); }
+  if (moves < best) { localStorage.setItem('mem_best', String(moves)); if (b) b.textContent = moves; }
+}
+
+// ---- Family movie list ----
+function renderTvMovies(app) {
+  return `<div class="app-ui tv">
+    <div class="tv-cats" id="tvCats"></div>
+    <div class="tv-list" id="tvList"></div>
+    <div class="tv-add">
+      <input id="tvTitle" placeholder="${t('Movie name')}" />
+      <select id="tvCat">
+        <option value="Sci-Fi">${t('Sci-Fi')}</option><option value="Animation">${t('Animation')}</option>
+        <option value="Documentary">${t('Documentary')}</option><option value="Comedy">${t('Comedy')}</option>
+      </select>
+      <button class="tv-addbtn" onclick="tvAdd()">${t('Add')}</button>
+    </div>
+  </div>`;
+}
+
+// ---- Timestamp Converter ----
+function renderTimestamp(app) {
+  const now = Math.floor(Date.now() / 1000);
+  const nowLocal = new Date(now * 1000);
+  const pad2 = n => String(n).padStart(2, '0');
+  const defaultDt = `${nowLocal.getFullYear()}-${pad2(nowLocal.getMonth()+1)}-${pad2(nowLocal.getDate())}T${pad2(nowLocal.getHours())}:${pad2(nowLocal.getMinutes())}`;
+  return `<div class="app-ui ts">
+    <div class="ts-row">
+      <label>${t('Timestamp')}</label>
+      <input id="tsInput" value="${now}" oninput="tsToTime()" />
+    </div>
+    <div class="ts-result" id="tsTimeResult">${tsFmt(now)}</div>
+    <div class="ts-row">
+      <label>${t('Date Time')}</label>
+      <input type="datetime-local" id="dtInput" value="${defaultDt}" onchange="timeToTs()" />
+    </div>
+    <div class="ts-result" id="tsTsResult">${now}</div>
+    <div class="ts-now">${t('🕰 Current Timestamp')}: <span id="tsNow">${now}</span></div>
+  </div>`;
+}
+
+function tsFmt(ts) {
+  const d = new Date(parseInt(ts) * 1000);
+  if (isNaN(d.getTime())) return t('Invalid timestamp');
+  const pad2 = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
+
+function tsToTime() {
+  const v = $('tsInput').value.trim();
+  $('tsTimeResult').textContent = v ? tsFmt(v) : t('Invalid timestamp');
+}
+
+function timeToTs() {
+  const v = $('dtInput').value;
+  if (!v) return;
+  const ms = new Date(v).getTime();
+  if (isNaN(ms)) { $('tsTsResult').textContent = t('Invalid date'); return; }
+  $('tsTsResult').textContent = Math.floor(ms / 1000);
+}
+
+let tvCat = 'all';
+function tvData() {
+  return idbGetJSON('tv_' + currentAppId).then(d => {
+    if (d && Array.isArray(d.movies)) return d;
+    const base = { movies: [
+      { title: 'Interstellar', category: 'Sci-Fi', fav: false },
+      { title: 'Kung Fu Panda', category: 'Animation', fav: false },
+      { title: 'A Bite of China', category: 'Documentary', fav: true },
+    ] };
+    return base;
+  });
+}
+function renderTv() {
+  const catEl = document.getElementById('tvCats'); const listEl = document.getElementById('tvList');
+  if (!catEl || !listEl) return;
+  tvData().then(d => {
+    const cats = ['all', ...new Set(d.movies.map(m => m.category))];
+    catEl.innerHTML = cats.map(c => `<span class="tv-cat${c === tvCat ? ' on' : ''}" data-c="${esc(c)}" onclick="tvPick('${esc(c)}')">${c === 'all' ? t('All') : esc(c)}</span>`).join('');
+    const list = tvCat === 'all' ? d.movies : d.movies.filter(m => m.category === tvCat);
+    listEl.innerHTML = list.length === 0
+      ? '<div class="tv-empty">' + t('No movies in this category') + '</div>'
+      : list.map((m, i) => `<div class="tv-item">
+          <span class="tv-num">★</span>
+          <span class="tv-title">${esc(m.title)}</span>
+          <span class="tv-cat-tag">${esc(m.category)}</span>
+          <button class="tv-fav" onclick="tvToggleFav(${d.movies.indexOf(m)})">${m.fav ? t('Saved') : t('Save')}</button>
+        </div>`).join('');
+  });
+  idbGetJSON('tv_' + currentAppId).then(d => { const f = document.getElementById('tvFavTotal'); if (f && d) f.textContent = t('Saved {{n}} movies', {n: (d.movies.filter(m => m.fav).length)}); });
+}
+function tvPick(c) { tvCat = c; renderTv(); }
+function tvToggleFav(idx) { tvData().then(d => { d.movies[idx].fav = !d.movies[idx].fav; return idbSetJSON('tv_' + currentAppId, d); }).then(() => renderTv()); }
+async function tvAdd() {
+  const title = document.getElementById('tvTitle').value.trim();
+  const cat = document.getElementById('tvCat').value;
+  if (!title) return;
+  const d = await tvData();
+  d.movies.push({ title, category: cat, fav: false });
+  await idbSetJSON('tv_' + currentAppId, d);
+  document.getElementById('tvTitle').value = '';
+  renderTv();
+}
+
+// ---- Generic JSON persistence (IndexedDB) ----
+function idbGetJSON(key) {
+  return idbGetBytes(key).then(v => { try { return v ? JSON.parse(v) : null; } catch (e) { return null; } });
+}
+function idbSetJSON(key, obj) { return idbSetBytes(key, JSON.stringify(obj)); }
+
+function updateThisApp() {
+  const app = _appData && _appData.app;
+  closeApp();
+  const g = getAppById(app.id) || app;
+  if (!g) return;
+  const mine = myApps.find(a => a.id === app.id);
+  openGenerator();
+  setGenTarget(mine || { id: app.id, name: app.name, version: app.version });
+  $('descInput').value = t('Improve "{{name}}":', {name: app.name});
+  $('genWindow').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ====== Minimize / maximize / close ======
+let _winMax = false;
+let _activeAppId = null;   // id of the app currently displayed in the app window (null when closed/minimized)
+
+function maximizeApp() {
+  _winMax = !_winMax;
+  $('appWindow').classList.toggle('fully', _winMax);
+  const btn = $('winMaxBtn');
+  if (btn) {
+    btn.textContent = _winMax ? '❐' : '□';
+    btn.title = _winMax ? t('Restore window') : t('Maximize');
+  }
+}
+function minimizeApp() {
+  if (!_appData || !_appData.app) return;
+  _activeAppId = null;
+  closeWindow(false);  // 最小化时保留 URL，方便收藏
+  updateDockHighlight();
+  renderTaskbar();
+}
+
+function closeApp() {
+  if (!_appData || !_appData.app) return;
+  _activeAppId = null;
+  closeWindow(true);  // 关闭时清除 URL
+  backgroundApps = backgroundApps.filter(a => a.id !== _appData.app.id);
+  renderTaskbar();
+  updateDockHighlight();
+  _appData = null;
+  currentAppId = null;
+}
+
+function closeWindow(clearUrl) {
+  $('appWindow').classList.remove('show');
+  document.body.style.overflow = '';
+  if (clearUrl) clearShareParam();
+  if (!document.title.startsWith('aiapp')) document.title = 'aiapp · AI-native cross-platform app market';
+}
+
+function customGenerate() {
+  const app = _appData && _appData.app;
+  closeApp();
+  // Always use "new" mode, referencing the existing app
+  setMode('new');
+  if (!$('genDrawer').classList.contains('show')) toggleGenerator();
+  $('descInput').value = app ? t('Reference "{{name}}" to make a similar app: ', {name: app.name}) : '';
+  $('genResult').innerHTML = '';
+  $('descInput').focus();
+}
+
+async function reportApp() {
+  const app = _appData && _appData.app;
+  if (!app) return;
+  const reason = prompt(t('Please briefly describe why you are reporting "{{name}}":', {name: app.name}), '');
+  if (reason === null) return;
+  try {
+    const res = await fetch('/api/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: app.id, reason })
+    });
+    const data = await res.json();
+    if (!data.ok) { alert(data.error || t('Report failed')); return; }
+    alert(t('Thanks, your report on "{{name}}" has been received. The admin will review it.', {name: app.name}));
+    loadMarket();
+  } catch (e) {
+    alert(t('Report failed: {{msg}}', {msg: e.message}));
+  }
+}
+
+function closeAllWindows() {
+  closeWindow();
+  _appData = null;
+  currentAppId = null;
+}
+
+// ====== Running-app tasks in the bottom nav bar (icons only; nothing shown when idle) ======
+function renderTaskbar() {
+  const icons = $('taskIcons');
+  if (!icons) return;
+  if (backgroundApps.length === 0) { icons.innerHTML = ''; return; }
+  icons.innerHTML = backgroundApps.map(a => `
+    <div class="task-icon${_activeAppId === a.id ? ' on' : ''}" onclick="reopenApp('${a.id}')" title="${esc(seedName(a))}">
+      <span>${appIcon(a.template)}</span>
+      <span class="task-close" onclick="event.stopPropagation(); killApp('${a.id}')">✕</span>
+    </div>`).join('');
+}
+function reopenApp(id) {
+  // 正在显示 → 最小化；已最小化/关闭 → 恢复显示
+  if (_activeAppId === id && $('appWindow').classList.contains('show')) {
+    minimizeApp();
+    return;
+  }
+  openApp(id);
+}
+function killApp(id) {
+  backgroundApps = backgroundApps.filter(a => a.id !== id);
+  if (currentAppId === id) { closeWindow(); _appData = null; currentAppId = null; }
+  renderTaskbar();
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s ?? '');
+  return d.innerHTML;
+}
+
+// ====== Login / register ======
+let currentUser = null;     // { id, name, role } or null
+let authMode = 'login';
+
+async function loadSession() {
+  try {
+    const res = await fetch('/api/auth/me');
+    const d = await res.json();
+    if (d.ok && d.user) currentUser = d.user;
+  } catch (e) { /* not logged in */ }
+  renderAuthUI();
+}
+
+function renderAuthUI() {
+  const el = document.getElementById('smUser');
+  if (!el) return;
+  if (currentUser) {
+    const admin = currentUser.role === 'admin'
+      ? '<span class="role-badge">' + t('Admin') + '</span>' : '';
+    el.innerHTML = `<div class="sm-user-info"><span class="sm-avatar">👤</span><span><b>${esc(currentUser.name)}</b>${admin}</span></div>
+      <button class="sm-user-logout" onclick="logout()">${t('Log out')}</button>`;
+  } else {
+    el.innerHTML = `<button class="sm-user-login" onclick="openLogin()">🔐 ${t('Log in / Register')}</button>`;
+  }
+}
+
+function onGenClick() {
+  if (!currentUser) { openLogin(); return; }
+  toggleGenerator();
+}
+
+function requireAuth() {
+  if (currentUser) return true;
+  openLogin();
+  return false;
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('on', t.dataset.mode === mode));
+  document.getElementById('authTitle').textContent = mode === 'register' ? t('Create Account') : t('Log in to aiapp');
+  document.getElementById('authSubmitBtn').textContent = mode === 'register' ? t('Register & Log in') : t('Log in');
+  document.getElementById('authMsg').textContent = '';
+}
+
+function openLogin() { setAuthMode('login'); document.getElementById('authModal').classList.add('show'); document.getElementById('authUser').focus(); }
+function closeAuth() { document.getElementById('authModal').classList.remove('show'); }
+
+async function authSubmit() {
+  const username = document.getElementById('authUser').value.trim();
+  const password = document.getElementById('authPass').value;
+  const msg = document.getElementById('authMsg');
+  if (!username) { msg.className = 'auth-msg err'; msg.textContent = t('Please enter a username'); return; }
+  if (!password) { msg.className = 'auth-msg err'; msg.textContent = t('Please enter a password'); return; }
+  if (password.length < 6) { msg.className = 'auth-msg err'; msg.textContent = t('Password must be at least 6 characters'); return; }
+  const url = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+  msg.className = 'auth-msg'; msg.textContent = t('Processing…');
+  try {
+    const res = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const d = await res.json();
+    if (!d.ok) { msg.className = 'auth-msg err'; msg.textContent = d.error || t('Operation failed'); return; }
+    currentUser = d.user;
+    msg.className = 'auth-msg ok'; msg.textContent = t('Success, entering…');
+    renderAuthUI();
+    closeAuth();
+    renderHomeIfVisible();
+    loadMarket();
+    // After login, refresh views that require auth
+    if (currentView === 'myapps') { loadMyApps(); }
+  } catch (e) {
+    msg.className = 'auth-msg err'; msg.textContent = t('Network error: {{msg}}', {msg: e.message});
+  }
+}
+
+async function logout() {
+  try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (e) { /* cookie cleared client-side if possible */ }
+  currentUser = null;
+  renderAuthUI();
+  await loadMarket();
+  setView('home');
+}
+
+// ====== Standalone page (/p/:id): app content only, no platform shell ======
+async function renderStandalone(id) {
+  const bb = document.getElementById('dock'); if (bb) bb.style.display = 'none';
+  const sm = document.getElementById('startMenu'); if (sm) sm.hidden = true;
+  const gen = document.getElementById('genWindow'); if (gen) gen.style.display = 'none';
+  const wrap = document.getElementById('wrap'); if (wrap) wrap.style.display = 'none';
+  const aw = document.getElementById('appWindow'); if (aw) aw.style.display = 'none';
+  const sw = document.getElementById('sysWindow'); if (sw) sw.style.display = 'none';
+  document.body.classList.add('standalone');
+  try {
+    const res = await fetch(`/api/app/${id}?lang=${currentLang}`);
+    const data = await res.json();
+    if (!data.ok || !data.app) {
+      document.body.insertAdjacentHTML('beforeend',
+        `<div id="standaloneRoot"><div class="lp-empty"><div class="big">😕</div><p>${esc(data.error || t('App not found'))}</p></div></div>`);
+      return;
+    }
+    const app = data.app;
+    document.title = seedName(app) + ' · aiapp';
+    const root = document.createElement('div');
+    root.id = 'standaloneRoot';
+    root.innerHTML = renderAppBody(app);
+    document.body.appendChild(root);
+    // Init per-template UI (same as the in-app window); no open animation on refresh.
+    if (app.template === 'todo' && document.getElementById('todoList')) initTodo(app.id);
+    if (app.template === 'pomodoro' && document.getElementById('pmTime')) { pm.reset(); refreshPomodoroUi(); renderPomodoroLog(); }
+    if (app.template === 'memory-game' && document.getElementById('memGrid')) memNew();
+    if (app.template === 'tv-movies' && document.getElementById('tvList')) renderTv();
+    // Branding bar at the bottom; hidden entirely for paid apps (hide_branding).
+    if (!app.hide_branding) {
+      const bar = document.createElement('div');
+      bar.className = 'standalone-brand';
+      bar.innerHTML = `<a href="/">${t('Powered by aiapp · Explore more apps')}</a>`;
+      document.body.appendChild(bar);
+    }
+  } catch (e) {
+    document.body.insertAdjacentHTML('beforeend',
+      `<div id="standaloneRoot"><div class="lp-empty"><div class="big">⚠️</div><p>${esc(t('Failed to load: {{msg}}', {msg: e.message}))}</p></div></div>`);
+  }
+}
+
+function openStandalone() {
+  if (_appData && _appData.app) {
+    window.open('/p/' + encodeURIComponent(_appData.app.id), '_blank');
+  }
+}
+
+// ====== Initialization ======
+(async function init() {
+  currentPlatforms = detectPlatforms();
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === currentLang));
+  applyStaticI18n();
+  // Standalone app page: /p/:id renders only the app content (no shell, no bottom bar).
+  const standaloneId = (location.pathname.match(/^\/p\/([^/]+)/) || [])[1];
+  if (standaloneId) { renderStandalone(standaloneId); return; }
+  renderTaskbar();
+  await loadSession();
+  const tres = await fetch('/api/templates');
+  const tdata = await tres.json();
+  templates = tdata.templates || [];
+  populateCategorySelects();
+  loadMarket();
+  loadMyApps();
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('appWindow').classList.contains('show')) minimizeApp();
+    else if (e.key === 'Escape' && $('sysWindow').classList.contains('show')) minimizeSysApp();
+    else if (e.key === 'Escape' && $('genWindow').classList.contains('show')) closeGenerator();
+    if (e.key === 'Escape') { closeStartMenu(); closeSettings(); }
+  });
+  // Clicking outside the start menu closes it
+  document.addEventListener('click', e => {
+    const sm = $('startMenu');
+    if (sm && !sm.hidden && !e.target.closest('#startBtn') && !e.target.closest('#startMenu')) closeStartMenu();
+  });
+  // Support share links: ?app=<id> opens and launches the app directly
+  const shareAppId = new URLSearchParams(location.search).get('app');
+  if (shareAppId) { openApp(shareAppId); }
+})();
+</script>
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+</body>
+</html>

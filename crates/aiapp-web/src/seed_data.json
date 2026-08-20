@@ -1,0 +1,122 @@
+[
+  {
+    "id": "quit-smoking", "name": "Quit Smoking Tracker", "template": "pomodoro", "version": "1.0.0",
+    "description": "A daily quit-smoking companion that tracks smoke-free time, money saved, and health recovery milestones. Shows day-by-day progress with a timer since last cigarette, daily savings, and health improvements (lung function, heart rate, circulation) at key milestones. Includes a craving log with urge intensity and coping strategies, plus achievement badges for 1-day, 1-week, 1-month, 100-day, and 1-year smoke-free goals.",
+    "tags": ["Health", "Habit", "Self-Improvement"], "platforms": ["Web", "Mobile", "Desktop", "macOS", "Windows", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "life", "net": "local"
+  },
+  {
+    "id": "learn-english", "name": "Daily English Learning", "template": "tv-movies", "version": "1.0.0",
+    "description": "A daily English learning app with categorized word lists, sentence patterns, and listening exercises. Features include: word-of-the-day with example sentences, categorized vocabulary by topic (travel, business, daily life, technology), common phrase collections, mini listening comprehension quizzes, a streak tracker showing consecutive days of practice, and a progress dashboard showing words learned, quizzes passed, and study time accumulated.",
+    "tags": ["Education", "Language", "Family"], "platforms": ["Web", "Mobile", "Desktop", "Tablet", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "family", "net": "local"
+  },
+  {
+    "id": "emergency-room", "name": "Emergency Command Center", "template": "minimal", "version": "1.0.0",
+    "description": "A personal emergency preparedness dashboard that organizes critical information for crisis situations. Features: emergency contact quick-dial panel (family, doctor, fire, police), medical info card (blood type, allergies, medications), household emergency checklist (fire, earthquake, flood, power outage), emergency supply inventory with expiry tracking, family meeting point map, and a step-by-step guided mode that walks through emergency procedures based on the type of incident selected.",
+    "tags": ["Safety", "Utility", "Family"], "platforms": ["Web", "Mobile", "Desktop", "Car", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "tool", "net": "local"
+  },
+  {
+    "id": "project-hub", "name": "Project Management Hub", "template": "todo", "version": "1.0.0",
+    "description": "A full-featured local project management tool inspired by TAPD. Supports creating multiple projects, each with task lists, kanban-style status columns (To Do, In Progress, Done), task priority labels (urgent/high/medium/low), assignee tracking, due dates, and task descriptions. Features include: drag-to-reorder tasks, progress percentage per project, a Today focus view showing tasks due or overdue, completion statistics with charts, and weekly productivity reports. All data stored locally in SQLite.",
+    "tags": ["Office", "Productivity", "Collaboration"], "platforms": ["Web", "Mobile", "Desktop", "macOS", "Windows", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "office", "net": "local"
+  },
+  {
+    "id": "car-sound", "name": "Car Engine Sound Simulator", "template": "minimal", "version": "1.0.0",
+    "description": "An interactive car engine sound simulator for car enthusiasts. Browse and play high-quality engine sound profiles by category: supercar (Ferrari, Lamborghini), muscle car (Mustang, Camaro), JDM (Supra, RX-7), classic (911, E-Type), and electric (Tesla, Taycan). Each profile shows RPM range, horsepower, and 0-60 time. Features a virtual throttle slider for real-time engine rev simulation, a favorites collection, and a 'mix' mode that layers engine sounds with ambient road noise for an immersive experience.",
+    "tags": ["Entertainment", "Car", "Fun"], "platforms": ["Car", "Mobile", "Desktop", "Web"],
+    "owner": "official", "visibility": "public", "category": "entertainment", "net": "local"
+  },
+  {
+    "id": "screensaver-calligraphy", "name": "Calligraphy Screensaver", "template": "minimal", "version": "1.0.0",
+    "description": "A dynamic TV screensaver that displays beautiful Chinese calligraphy artworks. Features: classic calligraphy masterpieces from famous artists (Wang Xizhi, Yan Zhenqing, Ouyang Xun, Mi Fu, Zhao Mengfu), each with artist name, dynasty, and style annotation. Smooth fade transitions between pieces, adjustable display duration (10s/30s/60s/120s), full-screen mode optimized for TV with 16:9, 16:10, and 4:3 aspect ratio support. Includes a clock overlay option and seasonal/holiday themed calligraphy collections.",
+    "tags": ["Entertainment", "Art", "TV", "Screensaver"], "platforms": ["TV Box", "Car", "Desktop", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "entertainment", "net": "local"
+  },
+  {
+    "id": "screensaver-art", "name": "Art Gallery Screensaver", "template": "minimal", "version": "1.0.0",
+    "description": "An elegant TV screensaver showcasing a curated art gallery. Features world-famous paintings from Renaissance to Impressionism (Mona Lisa, Starry Night, Water Lilies, The Persistence of Memory, The Scream, Girl with a Pearl Earring) with artist name, year, and art movement labels. Smooth Ken Burns zoom-and-pan transitions, adjustable display interval, clock overlay, and resolution-adaptive rendering for 4K, 1080p, and 720p screens. Supports portrait and landscape orientations for digital picture frames.",
+    "tags": ["Entertainment", "Art", "TV", "Screensaver"], "platforms": ["TV Box", "Car", "Desktop", "Tablet", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "entertainment", "net": "local"
+  },
+  {
+    "id": "screensaver-landscape", "name": "Landscape Screensaver", "template": "minimal", "version": "1.0.0",
+    "description": "A breathtaking nature landscape screensaver for TV and large screens. Displays stunning nature photography across categories: mountains (Himalayas, Alps, Rockies), oceans (tropical beaches, rugged coastlines, aurora borealis), forests (bamboo groves, autumn colors, misty rainforests), deserts (sand dunes, canyons, starry nights), and waterfalls. Features smooth crossfade transitions, time-of-day matched brightness (auto-dims at night), adjustable slideshow speed, and a GPS location label overlay. Optimized for 4K displays with 16:9 proportion.",
+    "tags": ["Entertainment", "Nature", "TV", "Screensaver"], "platforms": ["TV Box", "Car", "Desktop", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "entertainment", "net": "local"
+  },
+  {
+    "id": "screensaver-anime", "name": "Anime World Screensaver", "template": "minimal", "version": "1.0.0",
+    "description": "A vibrant anime-themed screensaver for TV and mobile devices. Features rotating collections of iconic anime scenery from Studio Ghibli, Makoto Shinkai films, and classic anime series — lush green fields, bustling city streets at sunset, starry night skies, serene Japanese gardens, and fantastical landscapes. Smooth dissolve transitions, adjustable display timing, clock overlay, and aspect-ratio-aware rendering for TV 16:9 and mobile portrait modes. Kid-safe content with no mature themes.",
+    "tags": ["Entertainment", "Anime", "TV", "Screensaver"], "platforms": ["TV Box", "Car", "Mobile", "Desktop", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "entertainment", "net": "local"
+  },
+  {
+    "id": "screensaver-funny", "name": "Funny Vibes Screensaver", "template": "minimal", "version": "1.0.0",
+    "description": "A lighthearted humorous screensaver that brightens up any room. Features rotating collections of wholesome memes, funny animal photos (cats, dogs, pandas, otters), clever puns, amusing minimalist comics, and funny quote cards. Each item includes a tiny laugh-rating display. Smooth transitions with playful bounce animations, adjustable display speed, and optional clock overlay. All content is family-friendly, G-rated, and copyright-free. Perfect for parties, waiting rooms, or just a mood boost.",
+    "tags": ["Entertainment", "Fun", "TV", "Screensaver", "Family"], "platforms": ["TV Box", "Car", "Mobile", "Desktop", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "entertainment", "net": "local"
+  },
+  {
+    "id": "level-runner", "name": "Level Runner Challenge", "template": "memory-game", "version": "1.0.0",
+    "description": "A progressively difficult reaction game with 10 levels. Level 1: tap the correct colored button (easy). Level 2: two colors appear, choose the right one. Each subsequent level adds complexity: Level 3 has 3 colors, Level 4 adds timing pressure, Level 5 introduces distractor buttons, Level 6 requires pattern recall, Level 7 has shrinking target areas, Level 8 adds multi-tap combos, Level 9 is extreme speed mode, Level 10 (The Wall) is brutally difficult with tiny targets, split-second timing, and random patterns. Features: high score leaderboard (local), level completion badges, reaction time stats, and a 'practice mode' to train specific levels. Players will keep coming back to beat The Wall.",
+    "tags": ["Game", "Challenge", "Fun", "Reaction"], "platforms": ["Web", "Mobile", "Desktop", "Tablet", "TV Box", "Car"],
+    "owner": "official", "visibility": "public", "category": "game", "net": "local"
+  },
+  {
+    "id": "puzzle-master", "name": "Puzzle Maze Master", "template": "memory-game", "version": "1.0.0",
+    "description": "A brain-teasing puzzle game with 20 levels of increasing difficulty. Early levels: simple pattern matching and memory recall (easy for anyone). Mid levels: grid-based logic puzzles, sequence memorization, and spatial reasoning challenges. Hard levels: multi-step combinatorial puzzles, rapid pattern recognition under time pressure, and complex symbol translation. The final 3 levels (The Gauntlet) combine all mechanics simultaneously with severe time limits. Features: per-level best time tracking, star ratings (1-3 stars per level), cumulative score with global percentile, daily challenge mode with a fresh puzzle each day, and a zen mode for relaxed play. Designed to keep players coming back for that 3-star rating.",
+    "tags": ["Game", "Puzzle", "Brain", "Challenge"], "platforms": ["Web", "Mobile", "Desktop", "Tablet", "TV Box", "Car"],
+    "owner": "official", "visibility": "public", "category": "game", "net": "local"
+  },
+  {
+    "id": "daily-ledger", "name": "Daily Expense Ledger", "template": "todo", "version": "1.0.0",
+    "description": "A personal daily expense tracker with categorized spending records. Features: add expenses with category (food, transport, shopping, entertainment, bills, health, education, other), amount, and optional note. Monthly budget setting per category with visual progress bars showing how much of the budget is used. Daily/weekly/monthly spending summaries with pie charts and trend lines. Search and filter by category, date range, or amount. Export data as CSV. All data stored locally in SQLite. The daily habit of logging expenses builds financial awareness over time.",
+    "tags": ["Finance", "Life", "Productivity"], "platforms": ["Web", "Mobile", "Desktop", "macOS", "Windows", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "life", "net": "local"
+  },
+  {
+    "id": "habit-forge", "name": "Habit Forge", "template": "pomodoro", "version": "1.0.0",
+    "description": "A habit-building app that helps forge daily routines. Create custom habits with frequency (daily, weekly, X times per week), duration target, and optional reminder times. Each day, check off completed habits and see your streak grow. Features: streak calendar showing consecutive days of completion, habit strength meter (the longer the streak, the stronger the habit), weekly completion rate bar chart, morning/evening routine templates, and a 'rescue' mode that lets you make up a missed habit within 24 hours. The visual streak and strength meter create a powerful motivation loop to keep users coming back daily.",
+    "tags": ["Habit", "Productivity", "Self-Improvement", "Health"], "platforms": ["Web", "Mobile", "Desktop", "macOS", "Windows", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "life", "net": "local"
+  },
+  {
+    "id": "water-reminder", "name": "Water Reminder", "template": "pomodoro", "version": "1.0.0",
+    "description": "A hydration tracking app that helps you drink enough water throughout the day. Set your daily water goal (default 8 glasses/2L) and track each glass you drink. Features: smart interval timer that reminds you to drink every 30-60 minutes based on your goal, visual progress ring showing percentage of daily goal achieved, hourly drinking history chart, customizable glass sizes (200ml, 250ml, 300ml, 500ml), weekly hydration trend graph, and motivational messages when you hit milestones. The ring animation and streak tracking create a satisfying daily completion loop.",
+    "tags": ["Health", "Habit", "Life"], "platforms": ["Web", "Mobile", "Desktop", "Car", "Wearable", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "life", "net": "local"
+  },
+  {
+    "id": "weight-tracker", "name": "Weight Tracker", "template": "tv-movies", "version": "1.0.0",
+    "description": "A weight management tracker for monitoring long-term progress. Log your weight daily with optional body fat percentage, waist circumference, and notes. Features: interactive weight trend chart with smooth line graph showing progress over days/weeks/months, BMI calculator with category indicator, goal weight setting with progress bar, milestone celebrations (every 5kg lost/gained), weekly/monthly average weight, and a weight change rate indicator. The long-term trend view is the key motivator — seeing gradual progress keeps users engaged for months.",
+    "tags": ["Health", "Fitness", "Life"], "platforms": ["Web", "Mobile", "Desktop", "macOS", "Windows", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "life", "net": "local"
+  },
+  {
+    "id": "reading-list", "name": "Reading List", "template": "tv-movies", "version": "1.0.0",
+    "description": "A personal book reading tracker and organizer. Add books with title, author, category (fiction, non-fiction, science, history, self-help, tech, business, biography), and reading status (want to read, reading, finished). Features: track reading progress by page number or percentage, add personal notes and ratings (1-5 stars), reading stats dashboard showing books read per month, total pages read, average rating, and favorite genres. Include a reading goal (books per year) with progress bar, and a 'discover' tab that suggests books from your most-read categories. The yearly reading goal and stats dashboard create a satisfying long-term engagement loop.",
+    "tags": ["Reading", "Education", "Life", "Family"], "platforms": ["Web", "Mobile", "Desktop", "Tablet", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "family", "net": "local"
+  },
+  {
+    "id": "workout-log", "name": "Workout Log", "template": "todo", "version": "1.0.0",
+    "description": "A comprehensive workout logging app for fitness enthusiasts. Log each workout session with exercise name, sets, reps, weight, and duration. Features: pre-built exercise library categorized by muscle group (chest, back, legs, shoulders, arms, core, cardio), custom exercise creation, workout template saving for quick logging, weekly training volume chart, progress tracking per exercise (weight lifted over time), rest timer between sets, and weekly workout summary with total volume and duration. The progressive overload tracking (seeing weights increase over time) is the key engagement driver that keeps gym-goers coming back.",
+    "tags": ["Fitness", "Health", "Life"], "platforms": ["Web", "Mobile", "Desktop", "Wearable", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "life", "net": "local"
+  },
+  {
+    "id": "sleep-tracker", "name": "Sleep Tracker", "template": "pomodoro", "version": "1.0.0",
+    "description": "A sleep quality tracker that helps build better sleep habits. Log bedtime, wake time, and subjective sleep quality rating (1-5 stars). Features: sleep duration calculator showing hours and minutes, sleep schedule consistency tracker (compare bedtime variance day-to-day), weekly sleep trend chart showing average duration and quality, sleep debt calculator (cumulative undersleep vs. 8-hour target), customizable bedtime reminder, and sleep hygiene tips based on your patterns. The consistency score and sleep debt visualization create a daily motivation loop for better sleep hygiene.",
+    "tags": ["Health", "Sleep", "Life"], "platforms": ["Web", "Mobile", "Desktop", "Wearable", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "life", "net": "local"
+  },
+  {
+    "id": "personal-journal", "name": "Personal Journal", "template": "tv-movies", "version": "1.0.0",
+    "description": "A private digital journal for daily reflections and personal growth. Write daily entries with rich text, mood selector (happy, calm, sad, anxious, excited, grateful, tired, angry), and optional tags. Features: calendar view showing which days have entries and the mood for each day, mood trend chart over time, word count stats per entry, search through past entries by text or tags, a 'on this day' feature showing entries from previous years, and a yearly summary showing total entries, most common mood, and longest writing streak. The mood tracking and calendar heatmap create a compelling daily reflection habit.",
+    "tags": ["Writing", "Life", "Mental Health", "Self-Improvement"], "platforms": ["Web", "Mobile", "Desktop", "macOS", "Windows", "HarmonyOS"],
+    "owner": "official", "visibility": "public", "category": "life", "net": "local"
+  }
+]

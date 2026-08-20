@@ -1,0 +1,21 @@
+[package]
+name = "aiapp-host"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "aiapp-host"
+path = "src/main.rs"
+
+[dependencies]
+aiapp-format = { git = "https://github.com/wy-ent/aiapp-lib.git", package = "aiapp-format" }
+aiapp-engine = { git = "https://github.com/wy-ent/aiapp-lib.git", package = "aiapp-engine" }
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs"] }
+
+[features]
+wasmtime = ["aiapp-engine/wasmtime"]

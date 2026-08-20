@@ -1,0 +1,27 @@
+[package]
+name = "aiapp-web"
+description = "aiapp-mb employee self-service prototyping service: enter a description -> generate a MoonBit app -> preview"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+aiapp-build = { git = "https://github.com/wy-ent/aiapp-lib.git", package = "aiapp-build" }
+aiapp-gen = { git = "https://github.com/wy-ent/aiapp-lib.git", package = "aiapp-gen" }
+anyhow.workspace = true
+axum.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+dotenvy = "0.15"
+async-trait = "0.1"
+sqlx = { version = "0.8", features = ["runtime-tokio", "any", "postgres", "sqlite"] }
+bcrypt = "0.15"
+jsonwebtoken = "9"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+hmac = "0.12"
+sha1 = "0.10"
+hex = "0.4"
+chrono = "0.4"

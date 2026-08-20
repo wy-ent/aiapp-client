@@ -1,0 +1,32 @@
+# Rust / Cargo
+target/
+**/target/
+Cargo.lock.bak
+
+# Local artifact storage (runtime data, mounted via volumes, keep out of the image)
+storage/
+**/storage/
+
+# Local development/deployment secrets
+.env
+.env.*
+!deploy.env.example
+deploy.env
+
+# Git
+.git/
+.gitignore
+
+# Docs and unrelated resources
+*.md
+docs/
+ARCHITECTURE.md
+
+# Editor / system
+.idea/
+.vscode/
+.DS_Store
+
+# CI / other
+.github/
+ci/
