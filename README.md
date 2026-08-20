@@ -1,3 +1,7 @@
+<p align="right">
+  <a href="README.zh-CN.md">中文</a> | <strong>English</strong>
+</p>
+
 # aiapp-client
 
 User-facing module of the aiapp ecosystem — Web market, backend API, and desktop/mobile runtime.

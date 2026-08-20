@@ -1,3 +1,7 @@
+<p align="right">
+  <strong>中文</strong> | <a href="README.md">English</a>
+</p>
+
 # aiapp-client
 
 aiapp 生态的用户端模块 — Web 市场、后端 API、桌面端/移动端运行时。
