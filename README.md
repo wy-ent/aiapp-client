@@ -18,8 +18,6 @@ The project is currently maintained by the author in spare time. Any form of con
 
 ## Roadmap
 
-Refer to the [AI Application Platform Evolution Roadmap](https://qcn5zapfb0ro.feishu.cn/wiki/ZpWuwQy8widUSCkDL0Wc9PM2nBd):
-
 ### Phase 1: Web MVP ✅ (current)
 
 - [x] End-to-end pipeline: description → AI generates MoonBit source → moon compiles WASM → .aiapp package

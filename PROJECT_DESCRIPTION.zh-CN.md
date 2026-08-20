@@ -93,10 +93,7 @@
 3. **阶段 3**：定 Telemetry schema，后台统计改为「事件上报 + Pro 聚合」。
 4. **阶段 4**：把上报的事件接入计费/分成单元。
 
-## 5. 外部参考资料
-- 飞书在线文档（`ai 应用平台`，含完整演进路线/架构图/风险避坑）
-  - wiki: https://qcn5zapfb0ro.feishu.cn/wiki/ZpWuwQy8widUSCkDL0Wc9PM2nBd
-  - docx: https://qcn5zapfb0ro.feishu.cn/docx/U95ndmSoso8RuoxU706c4QxAnpd
+
 
 ## 文档索引
 - `README.md` — 项目简介、流水线、快速运行

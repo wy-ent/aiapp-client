@@ -93,10 +93,7 @@ The open-source side (enterprise deployment) only produces and **anonymously rep
 3. **Phase 3**: define the Telemetry schema; change backend statistics to "event reporting + Pro aggregation."
 4. **Phase 4**: wire the reported events into billing/share units.
 
-## 5. External References
-- Feishu online docs (`ai application platform`, with full evolution roadmap/architecture diagrams/risk notes)
-  - wiki: https://qcn5zapfb0ro.feishu.cn/wiki/ZpWuwQy8widUSCkDL0Wc9PM2nBd
-  - docx: https://qcn5zapfb0ro.feishu.cn/docx/U95ndmSoso8RuoxU706c4QxAnpd
+
 
 ## Document Index
 - `README.md` — project intro, pipeline, quick start

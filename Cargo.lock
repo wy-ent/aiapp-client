@@ -17,6 +17,7 @@ dependencies = [
 [[package]]
 name = "aiapp-build"
 version = "0.1.0"
+source = "git+https://github.com/wy-ent/aiapp-lib.git#349c56f2f6ab1c30d18c866c0eefc0feceddeda9"
 dependencies = [
  "aiapp-format",
  "thiserror 1.0.69",
@@ -25,6 +26,7 @@ dependencies = [
 [[package]]
 name = "aiapp-engine"
 version = "0.1.0"
+source = "git+https://github.com/wy-ent/aiapp-lib.git#349c56f2f6ab1c30d18c866c0eefc0feceddeda9"
 dependencies = [
  "aiapp-format",
  "async-trait",
@@ -40,6 +42,7 @@ dependencies = [
 [[package]]
 name = "aiapp-format"
 version = "0.1.0"
+source = "git+https://github.com/wy-ent/aiapp-lib.git#349c56f2f6ab1c30d18c866c0eefc0feceddeda9"
 dependencies = [
  "serde",
  "serde_json",
@@ -49,6 +52,7 @@ dependencies = [
 [[package]]
 name = "aiapp-gen"
 version = "0.1.0"
+source = "git+https://github.com/wy-ent/aiapp-lib.git#349c56f2f6ab1c30d18c866c0eefc0feceddeda9"
 dependencies = [
  "serde",
  "serde_json",
