@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>App Sandbox</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: sans-serif; }
+    #app-root { width: 100%; height: 100%; overflow: auto; }
+  </style>
+</head>
+<body>
+  <div id="app-root"></div>
+  <script>
+    // App sandbox — loads the app's index.html and WASM from the backend
+    // This is a minimal shell; the actual app content is loaded dynamically.
+
+    // Get app ID from URL query
+    const params = new URLSearchParams(window.location.search);
+    const appId = params.get('app');
+
+    if (appId) {
+      // Load the app's HTML content
+      fetch(`/api/app/${appId}/html`)
+        .then(r => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.text();
+        })
+        .then(html => {
+          document.getElementById('app-root').innerHTML = html;
+
+          // Inject JS Bridge (HostApi)
+          window.__aiapp_bridge = {
+            storage_get: async (key) => {
+              if (window.__TAURI__) {
+                return await window.__TAURI__.invoke('storage_get', { key });
+              }
+              return null;
+            },
+            storage_set: async (key, value) => {
+              if (window.__TAURI__) {
+                return await window.__TAURI__.invoke('storage_set', { key, value });
+              }
+            },
+            storage_delete: async (key) => {
+              if (window.__TAURI__) {
+                return await window.__TAURI__.invoke('storage_delete', { key });
+              }
+            },
+            notify: async (title, body) => {
+              if (window.__TAURI__) {
+                return await window.__TAURI__.invoke('show_notification', { title, body });
+              }
+            },
+            log: (level, message) => {
+              if (window.__TAURI__) {
+                window.__TAURI__.invoke('log', { level, message });
+              }
+            },
+            platform: async () => {
+              if (window.__TAURI__) {
+                return await window.__TAURI__.invoke('platform');
+              }
+              return 'web';
+            }
+          };
+
+          // Load and run the app's WASM
+          const wasmUrl = `/api/app/${appId}/wasm`;
+          fetch(wasmUrl)
+            .then(r => r.arrayBuffer())
+            .then(bytes => WebAssembly.instantiate(bytes, {
+              host: window.__aiapp_bridge
+            }))
+            .then(wasm => {
+              if (wasm.instance.exports.run) {
+                wasm.instance.exports.run();
+              } else if (wasm.instance.exports.main) {
+                wasm.instance.exports.main();
+              }
+            })
+            .catch(err => {
+              console.warn('WASM not available or failed to load:', err);
+            });
+        })
+        .catch(err => {
+          document.getElementById('app-root').innerHTML =
+            `<p style="color:red;padding:20px;">Failed to load app: ${err.message}</p>`;
+        });
+    } else {
+      document.getElementById('app-root').innerHTML =
+        '<p style="padding:20px;color:#666;">No app specified.</p>';
+    }
+  </script>
+</body>
+</html>

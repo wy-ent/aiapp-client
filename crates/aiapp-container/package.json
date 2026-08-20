@@ -1,0 +1,17 @@
+{
+  "name": "aiapp-container",
+  "version": "0.1.0",
+  "private": true,
+  "description": "aiapp desktop container — Tauri shell",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "dev:android": "tauri android dev",
+    "build:android": "tauri android build",
+    "dev:ios": "tauri ios dev",
+    "build:ios": "tauri ios build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

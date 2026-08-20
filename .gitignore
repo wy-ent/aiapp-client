@@ -26,5 +26,9 @@ target/
 # Closed-source Pro / commercial middleware (pushed to a separate private repo, not this open-source repo)
 /pro/
 
+# Tauri container
+crates/aiapp-container/node_modules/
+crates/aiapp-container/frontend/node_modules/
+
 # System
 .DS_Store

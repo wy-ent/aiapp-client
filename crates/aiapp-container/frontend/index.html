@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>aiapp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Sidebar navigation -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <h1>aiapp</h1>
+    </div>
+    <ul class="nav-list">
+      <li class="nav-item active" data-tab="desktop">
+        <span class="nav-icon">&#9632;</span>
+        <span class="nav-label" data-i18n="desktop">Desktop</span>
+      </li>
+      <li class="nav-item" data-tab="store">
+        <span class="nav-icon">&#9733;</span>
+        <span class="nav-label" data-i18n="store">Store</span>
+      </li>
+      <li class="nav-item" data-tab="settings">
+        <span class="nav-icon">&#9881;</span>
+        <span class="nav-label" data-i18n="settings">Settings</span>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main content area -->
+  <main id="content">
+    <!-- Desktop tab -->
+    <section id="tab-desktop" class="tab-content active">
+      <div class="tab-header">
+        <h2 data-i18n="my_apps">My Apps</h2>
+      </div>
+      <div id="app-grid" class="app-grid">
+        <div class="app-grid-empty" data-i18n="no_apps">
+          No apps installed. Browse the Store to get started.
+        </div>
+      </div>
+    </section>
+
+    <!-- Store tab -->
+    <section id="tab-store" class="tab-content">
+      <div class="tab-header">
+        <h2 data-i18n="app_store">App Store</h2>
+        <div class="search-bar">
+          <input type="text" id="store-search" placeholder="Search apps..." data-i18n-placeholder="search_placeholder">
+        </div>
+      </div>
+      <div id="store-list" class="app-grid">
+        <div class="app-grid-empty" data-i18n="loading">Loading...</div>
+      </div>
+    </section>
+
+    <!-- Settings tab -->
+    <section id="tab-settings" class="tab-content">
+      <div class="tab-header">
+        <h2 data-i18n="settings">Settings</h2>
+      </div>
+      <div class="settings-panel">
+        <div class="setting-item">
+          <label data-i18n="backend_url">Backend URL</label>
+          <input type="text" id="setting-backend-url" placeholder="https://api.aiapp.dev">
+        </div>
+        <div class="setting-item">
+          <label data-i18n="language">Language</label>
+          <select id="setting-lang">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label data-i18n="platform">Platform</label>
+          <span id="setting-platform">-</span>
+        </div>
+        <div class="setting-item">
+          <label data-i18n="renderer">Renderer</label>
+          <span id="setting-renderer">-</span>
+        </div>
+        <button id="btn-clear-data" class="btn btn-danger" data-i18n="clear_data">Clear All Data</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- App runner overlay -->
+  <div id="app-overlay" class="overlay hidden">
+    <div class="overlay-header">
+      <button id="btn-close-app" class="btn-close">&larr;</button>
+      <span id="overlay-app-title">App</span>
+    </div>
+    <div class="overlay-body">
+      <iframe id="app-sandbox" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

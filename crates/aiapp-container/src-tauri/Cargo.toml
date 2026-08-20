@@ -1,0 +1,20 @@
+[package]
+name = "aiapp-container"
+version = "0.1.0"
+description = "aiapp desktop container — Tauri shell that hosts AI apps via WebView"
+edition = "2021"
+rust-version = "1.75"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+aiapp-format = { git = "https://github.com/wy-ent/aiapp-lib.git" }
+aiapp-render = { git = "https://github.com/wy-ent/aiapp-lib.git" }
+
+[profile.release]
+strip = true
