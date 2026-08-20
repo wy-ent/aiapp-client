@@ -4,9 +4,6 @@
   "version": "0.1.0",
   "identifier": "com.wy-ent.aiapp",
   "build": {
-    "beforeDevCommand": "",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "",
     "frontendDist": "../frontend"
   },
   "app": {
