@@ -637,6 +637,31 @@
   .tv .tv-addbtn { padding: 0 18px; border-radius: 8px; border: 0; background: var(--accent);
     color: #fff; cursor: pointer; font-weight: 600; }
 
+  /* ===== Audio simulator (engine sound / audio player) ===== */
+  .audio-sim { align-items: stretch; }
+  .as-presets { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .as-preset { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); cursor: pointer; font-size: 13px; }
+  .as-preset:hover { border-color: var(--accent); }
+  .as-preset.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .as-stage { background: radial-gradient(120% 120% at 50% 0%, #2a2f3a 0%, #1b1f27 100%);
+    border: 1px solid var(--border); border-radius: 14px; padding: 18px; text-align: center; color: #e8eaef; }
+  .as-rpm { height: 14px; background: #11141a; border-radius: 999px; overflow: hidden; margin: 12px auto; max-width: 360px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+  .as-rpm-fill { height: 100%; width: 0; border-radius: 999px;
+    background: linear-gradient(90deg,#36c5f0,#ffd166 55%,#ff5a5f); transition: width .08s linear; }
+  .as-readout { font-family: var(--font-head); font-size: 22px; font-weight: 800; letter-spacing: 1px; }
+  .as-throttle { display: flex; flex-direction: column; gap: 6px; }
+  .as-throttle label { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .as-throttle input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .as-btns { display: flex; gap: 10px; justify-content: center; }
+  .as-play, .as-stop { padding: 11px 26px; border-radius: 10px; border: 0; cursor: pointer; font-size: 14px; font-weight: 700; }
+  .as-play { background: var(--accent); color: #fff; }
+  .as-play:disabled { background: var(--panel-2); color: var(--muted); cursor: not-allowed; }
+  .as-stop { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+  .as-stop:disabled { color: var(--muted); cursor: not-allowed; }
+  .as-hint { text-align: center; font-size: 12px; color: var(--muted); }
+
   /* ===== Publish modal ===== */
   .modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 200;
@@ -669,6 +694,72 @@
   .modal .m-btn:hover { border-color: var(--muted); }
   .modal .m-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .modal .m-btn.primary:hover { background: var(--accent-2); }
+
+  /* ===== Settings sections ===== */
+  .set-section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .set-section:last-of-type { border-bottom: none; }
+  .set-section .modal-sub { margin-bottom: 10px; }
+  .set-section label { margin-top: 10px; }
+  .set-model-row { display: flex; gap: 8px; }
+  .set-model-row input { flex: 1; }
+  .set-api-status { font-size: 12px; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; }
+  .set-api-status.ok { background: rgba(34,197,94,.12); color: #22c55e; }
+  .set-api-status.warn { background: rgba(245,158,11,.12); color: var(--warn); }
+  .set-usage { display: flex; gap: 16px; flex-wrap: wrap; }
+  .set-usage .usage-card { flex: 1; min-width: 100px; background: var(--panel-2); border-radius: 8px; padding: 14px; text-align: center; }
+  .set-usage .usage-num { font-size: 28px; font-weight: 700; color: var(--accent); }
+  .set-usage .usage-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ===== Emergency Command Center ===== */
+  .emc { overflow: auto; height: 100%; padding: 18px; box-sizing: border-box; }
+  .emc-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap: 16px; align-items: start; }
+  .emc-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .emc-wide { grid-column: 1 / -1; }
+  .emc-card h4 { margin: 0 0 12px; font-size: 15px; }
+  .emc-cts, .emc-supps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  .emc-ct { display: flex; align-items: center; gap: 8px; background: var(--panel); padding: 8px 10px; border-radius: 8px; }
+  .emc-ct-name { font-weight: 600; }
+  .emc-ct-rel { color: var(--muted); font-size: 12px; }
+  .emc-ct-call { margin-left: auto; color: var(--accent); text-decoration: none; }
+  .emc-del { background: none; border: none; color: var(--muted); cursor: pointer; }
+  .emc-add { display: flex; gap: 6px; flex-wrap: wrap; }
+  .emc-add input { flex: 1; min-width: 90px; }
+  .emc-add button, .emc-save { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+  .emc-save { width: 100%; margin-top: 10px; }
+  .emc-card label { display: block; margin-top: 8px; }
+  .emc-card input { width: 100%; box-sizing: border-box; margin-top: 4px; }
+  .emc-ck { display: block !important; margin-top: 4px !important; font-size: 13px; cursor: pointer; }
+  .emc-chk { border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; }
+  .emc-chk legend { font-size: 12px; color: var(--muted); padding: 0 6px; }
+  .emc-checks { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 10px; }
+  .emc-supp { display: flex; align-items: center; gap: 8px; background: var(--panel); padding: 8px 10px; border-radius: 8px; }
+  .emc-supp-exp { margin-left: auto; color: var(--muted); font-size: 11px; }
+  .emc-supp-exp.over { color: var(--warn); font-weight: 600; }
+  .emc-empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+  .emc-gtabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .emc-gtab { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); color: var(--text); cursor: pointer; }
+  .emc-gtab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .emc-steps { margin: 0; padding-left: 6px; counter-reset: emcstep; }
+  .emc-steps li { list-style: none; padding: 10px 12px; margin-bottom: 8px; background: var(--panel); border-radius: 8px; border-left: 3px solid var(--accent); }
+  .emc-steps li b { color: var(--accent); margin-right: 6px; }
+
+  /* ===== Screensaver engine ===== */
+  .app-ui.ss { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; }
+  .ss-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease; pointer-events: none; }
+  .ss-slide.on { opacity: 1; }
+  .ss-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.02); animation: ssKenburns 18s ease-in-out infinite alternate; }
+  .ss-slide:not(.on) .ss-img { animation: none; }
+  .ss-fallback, .ss-slide img[class="ss-img ss-fallback"] { object-fit: none; }
+  @keyframes ssKenburns { from { transform: scale(1) translate(0,0); } to { transform: scale(1.08) translate(1.5%,-1.5%); } }
+  .ss-cap { position: absolute; left: 0; right: 0; bottom: 12%; text-align: center; color: #fff; font-size: 22px; font-weight: 600; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  .ss-overlay { position: absolute; inset: 0; pointer-events: none; }
+  .ss-clock { position: absolute; top: 20px; right: 28px; color: rgba(255,255,255,.9); font-size: 40px; font-weight: 300; text-shadow: 0 2px 10px rgba(0,0,0,.5); font-variant-numeric: tabular-nums; }
+  .ss-dots { position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+  .ss-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.35); cursor: pointer; pointer-events: auto; }
+  .ss-dot.on { background: #fff; }
+  .ss-controls { position: absolute; bottom: 14px; right: 20px; display: flex; gap: 6px; align-items: center; pointer-events: auto; }
+  .ss-controls button, .ss-controls select { background: rgba(0,0,0,.45); color: #fff; border: 1px solid rgba(255,255,255,.3); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .ss-controls select { color: #fff; }
 
   /* ===== Login / register ===== */
   .auth-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
@@ -760,13 +851,50 @@
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
     <h3>⚙️ <span data-i18n="Settings">Settings</span></h3>
-    <div class="modal-sub" data-i18n="Platform preferences">Platform preferences</div>
-    <label data-i18n="Language">Language</label>
-    <div class="sm-lang set-lang">
-      <button class="lang-btn" data-lang="zh-CN" onclick="setLang('zh-CN')">中文</button>
-      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+
+    <!-- AI API Config -->
+    <div class="set-section">
+      <div class="modal-sub" data-i18n="AI Generation API">AI Generation API</div>
+      <div class="set-api-status" id="setApiStatus"></div>
+      <label data-i18n="API Key">API Key</label>
+      <input id="setApiKey" type="password" data-i18n-ph="sk-..." placeholder="sk-...">
+      <label data-i18n="API Base URL">API Base URL</label>
+      <input id="setBaseUrl" data-i18n-ph="https://api.openai.com/v1" placeholder="https://api.openai.com/v1">
+      <label data-i18n="Model">Model</label>
+      <div class="set-model-row">
+        <input id="setModel" list="modelList" data-i18n-ph="gpt-4o-mini" placeholder="gpt-4o-mini">
+        <datalist id="modelList">
+          <option value="gpt-4o-mini">
+          <option value="gpt-4o">
+          <option value="gpt-4.1-mini">
+          <option value="deepseek-chat">
+          <option value="deepseek-reasoner">
+          <option value="claude-3-5-sonnet-20241022">
+          <option value="qwen-plus">
+          <option value="qwen-turbo">
+        </datalist>
+      </div>
+      <div class="modal-hint" id="setServerHint"></div>
+      <button class="m-btn primary" onclick="saveApiSettings()" data-i18n="Save API Settings">Save API Settings</button>
     </div>
-    <div class="modal-hint set-about">aiapp · AI-native cross-platform apps</div>
+
+    <!-- Usage Stats -->
+    <div class="set-section">
+      <div class="modal-sub" data-i18n="My Usage">My Usage</div>
+      <div class="set-usage" id="setUsage"></div>
+    </div>
+
+    <!-- Language -->
+    <div class="set-section">
+      <div class="modal-sub" data-i18n="Platform preferences">Platform preferences</div>
+      <label data-i18n="Language">Language</label>
+      <div class="sm-lang set-lang">
+        <button class="lang-btn" data-lang="zh-CN" onclick="setLang('zh-CN')">中文</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="modal-hint set-about">aiapp · AI-native cross-platform apps</div>
+    </div>
+
     <div class="modal-actions">
       <button class="m-btn primary" onclick="closeSettings()" data-i18n="Done">Done</button>
     </div>
@@ -980,6 +1108,31 @@ const I18N_ZH = {
   'Click an icon to launch. Discover more in the App Market.': '点击图标即刻启动，去「应用市场」发现更多',
   'Sign in to launch apps with one click and collect them automatically': '登录后即可同步 & 收藏你的应用',
   'Sign in to launch this app': '登录后即可启动该应用',
+  'Emergency Contacts': '紧急联系人',
+  'No contacts yet': '还没有联系人',
+  'Name': '姓名',
+  'Relation': '关系',
+  'Phone': '电话',
+  'Medical Info Card': '医疗信息卡',
+  'Blood type': '血型',
+  'Allergies': '过敏史',
+  'List allergies…': '填写过敏原…',
+  'Medications': '长期用药',
+  'Active prescriptions…': '当前服用中的药物…',
+  'Save Medical Card': '保存医疗卡',
+  'Household Emergency Checklist': '家庭应急清单',
+  'Fire': '火灾',
+  'Earthquake': '地震',
+  'Flood': '洪水',
+  'Power outage': '停电',
+  'Supply Inventory': '物资库存',
+  'No supplies yet': '还没有物资',
+  'Item': '物资',
+  'Qty': '数量',
+  'Expiry': '保质期至',
+  'Expires: ': '到期: ',
+  'Crisis Response Guide': '分步式危机指引',
+  'Select an incident type above to begin the guided response.': '请在上方选择一种突发事件类型，开始分步式应对指引。',
   '🔥 Featured Apps': '🔥 精选应用',
   '🌐 App Market': '🌐 应用市场',
   'Your Apps': '我的应用',
@@ -1021,6 +1174,18 @@ const I18N_ZH = {
   'Language': '语言',
   'Platform preferences': '平台偏好设置',
   'Done': '完成',
+  'AI Generation API': 'AI 生成 API',
+  'API Key': 'API Key',
+  'API Base URL': 'API 地址',
+  'Model': '模型',
+  'Save API Settings': '保存 API 设置',
+  'My Usage': '我的用量',
+  'Apps Generated': '生成应用数',
+  'App Launches': '应用启动数',
+  '✅ AI generation enabled (using your API key)': '✅ AI 生成已启用（使用你的 API Key）',
+  '⚠ AI not configured. Enter your API key to enable AI generation, or select a template below.': '⚠ AI 未配置。填写你的 API Key 以启用 AI 生成，或在下方选择模板。',
+  'Server default: {{backend}} / {{model}}': '服务器默认：{{backend}} / {{model}}',
+  'Save failed': '保存失败',
   '🚀 Publish to App Market': '🚀 发布到应用市场',
   'Auto review by category: tool / office apps auto-approve; the rest enter manual review': '按分类自动审核：工具 / 办公类自动通过，其余进入人工审核',
   'App name *': '应用名称 *',
@@ -1052,6 +1217,7 @@ const I18N_ZH = {
   'Will update "{{name}}" based on your new description.\nA new version will be created (v{{ver}} -> v{{next}}) and will take effect after the owner (you) approves.\nContinue?': '将根据你的新描述更新「{{name}}」。\n生成后会新增一个版本（v{{ver}} -> v{{next}}），需所有者（你）同意后生效。\n确定继续吗？',
   'Generating…': '生成中…',
   'Generation failed': '生成失败',
+  'Select a template below': '在下方选择一个模板',
   'Updated to new version v{{ver}} (only visible to you)': '已更新到新版本 v{{ver}}（仅你可使用）',
   'New app created (only visible to you)': '已新建应用（仅你可使用）',
   '▶ Use Now': '▶ 立即使用',
@@ -1411,6 +1577,7 @@ function setView(view) {
 // ====== System window: platform modules (App Market / My Apps) open as apps ======
 let _sysWinMax = false;
 let _sysApp = null;   // 'market' | 'myapps' | null
+let _returnToSysApp = null;   // 打开应用时来自哪个系统窗口，关闭应用后还原
 
 function openSysApp(type) {
   if (type === 'myapps' && !currentUser) { openLogin(); return; }
@@ -1457,6 +1624,30 @@ function closeSysApp() {
   setView('home');
 }
 
+// 重新打开系统窗口（市场/我的应用），保留之前的搜索与筛选状态
+function reopenSysApp(type) {
+  $('viewMarket').hidden = type !== 'market';
+  $('viewMyApps').hidden = type !== 'myapps';
+  $('sysWinName').textContent = type === 'market' ? t('App Market') : t('My Apps');
+  _sysApp = type;
+  currentView = type;
+  $('sysWindow').classList.add('show');
+  if (!_sysWinMax) maximizeSysApp();
+  document.body.style.overflow = 'hidden';
+  updateDockHighlight();
+  if (type === 'market') renderMarketApps();
+  else loadMyApps();
+}
+
+// 关闭应用后还原当初打开它的市场/我的应用界面
+function restoreSysAfterApp() {
+  if (_returnToSysApp) {
+    const type = _returnToSysApp;
+    _returnToSysApp = null;
+    reopenSysApp(type);
+  }
+}
+
 function updateDockHighlight() {
   // 应用窗口打开时 dock-task 全部不亮（由应用任务图标高亮）；否则按当前视图高亮
   const appActive = _activeAppId && $('appWindow').classList.contains('show');
@@ -1498,9 +1689,66 @@ function smGo(view) {
 function openSettings() {
   closeStartMenu();
   $('settingsModal').classList.add('show');
+  loadSettings();
 }
 function closeSettings() {
   $('settingsModal').classList.remove('show');
+}
+
+async function loadSettings() {
+  try {
+    const res = await fetch('/api/settings');
+    const data = await res.json();
+    if (!data.ok) return;
+    const s = data.settings || {};
+    const srv = data.server || {};
+    const u = data.usage || {};
+    // API key: show masked value if set, otherwise empty
+    $('setApiKey').value = s.ai_api_key || '';
+    $('setBaseUrl').value = s.ai_base_url || '';
+    $('setModel').value = s.ai_model || '';
+    // Status badge
+    const st = $('setApiStatus');
+    if (s.has_key) {
+      st.className = 'set-api-status ok';
+      st.textContent = t('✅ AI generation enabled (using your API key)');
+    } else {
+      st.className = 'set-api-status warn';
+      st.textContent = t('⚠ AI not configured. Enter your API key to enable AI generation, or select a template below.');
+    }
+    // Server defaults hint
+    $('setServerHint').textContent = t('Server default: {{backend}} / {{model}}', {
+      backend: srv.backend || 'mock',
+      model: srv.model || 'gpt-4o-mini'
+    });
+    // Usage
+    $('setUsage').innerHTML =
+      `<div class="usage-card"><div class="usage-num">${u.apps_generated || 0}</div><div class="usage-label">${t('Apps Generated')}</div></div>` +
+      `<div class="usage-card"><div class="usage-num">${u.launches || 0}</div><div class="usage-label">${t('App Launches')}</div></div>`;
+  } catch (e) { /* ignore */ }
+}
+
+async function saveApiSettings() {
+  const payload = {
+    ai_api_key: $('setApiKey').value.trim(),
+    ai_base_url: $('setBaseUrl').value.trim(),
+    ai_model: $('setModel').value.trim(),
+  };
+  try {
+    const res = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.ok) {
+      loadSettings();  // refresh masked key + status
+    } else {
+      alert(data.error || t('Save failed'));
+    }
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
 // ====== Home: Bing-style entrance / launchpad ======
@@ -1718,7 +1966,14 @@ async function generateApp() {
     setView('myapps');
     await loadMyApps();
   } catch (e) {
-    $('genResult').innerHTML = '✗ ' + e.message;
+    const msg = e.message || '';
+    const isAiDisabled = msg.includes('AI 生成未启用') || msg.includes('AIAPP_BACKEND') || msg.includes('AIAPP_OPENAI_API_KEY');
+    $('genResult').innerHTML = isAiDisabled
+      ? `<div style="color:var(--warn)">⚠ ${esc(msg)}</div>
+         <div class="res-actions">
+           <button class="res-btn primary" onclick="$('tplMini').scrollIntoView({behavior:'smooth'})">${t('Select a template below')}</button>
+         </div>`
+      : '✗ ' + esc(msg);
   } finally {
     btn.disabled = false; btn.textContent = t('✨ Generate');
   }
@@ -2094,6 +2349,9 @@ async function confirmPublish() {
 
 // ====== Open app ======
 let _appData = null;
+// 平台层窗口缓存：appId -> 已渲染的运行时 DOM 节点（含计时器/画布/牌局等全部状态）。
+// 应用切走时保留节点、不销毁；切回时直接挂载回去，从而任何模板（含非持久化的记忆翻牌）都不丢状态。
+const _winCache = new Map();
 
 function getAppById(id) {
   return myApps.find(a => a.id === id)
@@ -2114,10 +2372,15 @@ async function openApp(id) {
   }
 }
 
-function showWindow(app, content) {
-  if ($('sysWindow').classList.contains('show')) closeSysApp();
-  if ($('genWindow').classList.contains('show')) closeGenerator();
-  // 更新 URL 为 ?app=<id>，方便收藏书签后下次直接打开
+// 把当前正在显示的应用窗口的运行时 DOM 缓存起来（不销毁），供稍后切回时恢复。
+function cacheCurrentWindow() {
+  if (!_activeAppId) return;
+  const cur = $('winBody').firstElementChild;
+  if (cur) _winCache.set(_activeAppId, cur);
+}
+
+// 统一的窗口外观/元信息更新（标题栏、版本、平台、归属、操作按钮）
+function applyWindowChrome(app) {
   const u = new URL(location.href);
   u.searchParams.set('app', app.id);
   history.replaceState({}, '', u.pathname + u.search + u.hash);
@@ -2125,13 +2388,11 @@ function showWindow(app, content) {
   $('winName').innerHTML = appIconHTML(app) + ' ' + esc(seedName(app));
   $('winVersion').textContent = 'v' + app.version;
   $('winPlatforms').innerHTML = (app.platforms || []).map(p => `<span class="plat-badge">${normPlat(p)}</span>`).join('');
-  $('winBody').innerHTML = renderAppBody(app);
   const isMine = !!currentUser && app.owner === currentUser.id;
   $('winOwner').innerHTML =
     `<span>${t('Owner: ')}${(currentUser && app.owner === currentUser.id) ? t('Me') : esc(app.owner)}</span>` +
     appStatusBadge(app) +
     appShareBadge(app);
-  // Action buttons: your own apps can be updated; official/other apps can only be used as a reference for a new one
   if (isMine) {
     $('winActionBtns').innerHTML =
       `<button class="custom-gen" onclick="copyShareLink('${app.id}')">${t('🔗 Share Link')}</button>
@@ -2142,6 +2403,43 @@ function showWindow(app, content) {
       `<button class="custom-gen" onclick="copyShareLink('${app.id}')">${t('🔗 Share Link')}</button>
        <button class="custom-gen" onclick="customGenerate()">${t('Generate a New App Based on This One')}</button>`;
   }
+}
+
+// 恢复已缓存的应用窗口：复用缓存的运行时 DOM，不重新渲染 body、不重新初始化，
+// 因此所有运行时状态（计时 / 牌局 / 画布）原样保留。
+function restoreCachedWindow(app) {
+  applyWindowChrome(app);
+  const cached = _winCache.get(app.id);
+  $('winBody').innerHTML = '';
+  if (cached) $('winBody').appendChild(cached);
+  $('appWindow').classList.add('show');
+  if (!_winMax) maximizeApp();
+  document.body.style.overflow = 'hidden';
+  if (!backgroundApps.find(a => a.id === app.id)) backgroundApps.push({ id: app.id, name: app.name, template: app.template });
+  _activeAppId = app.id;
+  currentAppId = app.id;
+  updateDockHighlight();
+  renderTaskbar();
+}
+
+function showWindow(app, content) {
+  // 从市场/我的应用打开应用时：隐藏系统窗口但保留其子视图状态，
+  // 关闭应用后通过 restoreSysAfterApp() 还原市场界面
+  if ($('sysWindow').classList.contains('show')) {
+    _returnToSysApp = _sysApp;
+    $('sysWindow').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  if ($('genWindow').classList.contains('show')) closeGenerator();
+  // 切换/打开任意应用时，先熄灭可能正在播放的引擎声浪，避免声音泄漏到后台
+  try { if (typeof engineAudio !== 'undefined' && engineAudio.playing) asStop(); } catch (e) {}
+  // 离开当前正在显示的应用前，先把它的运行时 DOM 缓存起来（不销毁），
+  // 这样任何时刻切走再切回都能完整保留状态（计时 / 牌局 / 画布）。
+  if (_activeAppId) cacheCurrentWindow();
+  // 目标应用此前已打开且未关闭 → 直接恢复其运行时 DOM，不重建、不重新初始化
+  if (_winCache.has(app.id)) { restoreCachedWindow(app); return; }
+  applyWindowChrome(app);
+  $('winBody').innerHTML = renderAppBody(app);
   $('appWindow').classList.add('show');
   if (!_winMax) maximizeApp();   // 启动应用后默认最大化
   document.body.style.overflow = 'hidden';
@@ -2152,10 +2450,15 @@ function showWindow(app, content) {
   _activeAppId = app.id;
   updateDockHighlight();   // 打开应用后 dock-task 不再高亮固定图标，改由应用任务图标高亮
   if (app.template === 'todo' && document.getElementById('todoList')) initTodo(app.id);
-  if (app.template === 'pomodoro' && document.getElementById('pmTime')) { pm.reset(); refreshPomodoroUi(); renderPomodoroLog(); }
+  if (app.template === 'pomodoro' && document.getElementById('pmTime')) { pm.restore(); refreshPomodoroUi(); renderPomodoroLog(); }
   if (app.template === 'memory-game' && document.getElementById('memGrid')) memNew();
   if (app.template === 'tv-movies' && document.getElementById('tvList')) renderTv();
+  if (app.id === 'emergency-room') initEmergency(app.id);
+  if (app.id.startsWith('screensaver-')) initScreensaver(app.id);
   renderTaskbar();
+  // 把新渲染的运行时 DOM 缓存起来，供切走后恢复
+  const body = $('winBody').firstElementChild;
+  if (body) _winCache.set(app.id, body);
 }
 
 // ====== Interactive app UI (real operable UI rendered per template) ======
@@ -2167,6 +2470,9 @@ function renderAppBody(app) {
   if (app.template === 'memory-game') return renderMemoryGame(app);
   if (app.template === 'tv-movies') return renderTvMovies(app);
   if (app.template === 'timestamp') return renderTimestamp(app);
+  if (app.template === 'audio-sim' || (app.template === 'minimal' && appIsAudio(app))) return renderAudioSim(app);
+  if (app.id === 'emergency-room') return renderEmergency(app);
+  if (app.id.startsWith('screensaver-')) return renderScreensaver(app);
   return renderMinimal(app);
 }
 
@@ -2181,6 +2487,281 @@ function renderMinimal(app) {
     </div>
   </div>`;
 }
+
+// ===== Audio simulator (engine sound / audio player) =====
+// 全局引擎音频状态（与 pomodoro 类似为单例；仅一个音频应用在播）。
+let engineAudio = { ctx:null, osc:null, osc2:null, filter:null, gain:null, playing:false, preset:'hyper', throttle:0 };
+const ENGINE_PRESETS = {
+  hyper:   { base: 95,  type:'sawtooth', top: 3.4 },
+  muscle:  { base: 55,  type:'sawtooth', top: 2.4 },
+  jdm:     { base: 78,  type:'square',   top: 3.0 },
+  classic: { base: 68,  type:'triangle', top: 2.2 },
+  ev:      { base: 320, type:'sine',     top: 1.7 },
+};
+// 名字/描述里含音频相关语义的 minimal 应用，自动渲染为可交互的声浪模拟器
+function appIsAudio(app) {
+  const s = ((app.name||'') + ' ' + (seedDesc(app)||'') + ' ' + (app.description||'')).toLowerCase();
+  return /声浪|引擎|发动机|engine|sound|audio|音乐|播放|电台|radio|轰鸣|排气|转速|喇叭/.test(s);
+}
+function renderAudioSim(app) {
+  engineAudio.throttle = 0; engineAudio.preset = 'hyper';
+  const presets = [
+    ['hyper','🏎 超跑'], ['muscle','🛻 肌肉车'], ['jdm','🚗 JDM'],
+    ['classic','🚙 经典车'], ['ev','⚡ 电动车']
+  ];
+  const btns = presets.map(([k,label], i) =>
+    `<button class="as-preset${i===0?' on':''}" data-preset="${k}" onclick="asSelectPreset('${k}')">${label}</button>`).join('');
+  return `<div class="app-ui audio-sim">
+    <div class="as-presets">${btns}</div>
+    <div class="as-stage">
+      <div class="as-rpm"><div class="as-rpm-fill" id="asRpm"></div></div>
+      <div class="as-readout" id="asReadout">怠速</div>
+    </div>
+    <div class="as-throttle">
+      <label>虚拟油门（踩下听声浪）</label>
+      <input type="range" id="asThrottle" min="0" max="100" value="0" oninput="asThrottle(this.value)" />
+    </div>
+    <div class="as-btns">
+      <button class="as-play" id="asPlay" onclick="asPlay()">▶ 启动引擎</button>
+      <button class="as-stop" id="asStop" onclick="asStop()" disabled>■ 熄火</button>
+    </div>
+    <div class="as-hint">选择车型 → 踩下油门，Web Audio 实时合成引擎声浪</div>
+  </div>`;
+}
+function asSelectPreset(k) {
+  engineAudio.preset = k;
+  document.querySelectorAll('.as-preset').forEach(b => b.classList.toggle('on', b.dataset.preset === k));
+  if (engineAudio.playing) asApplyThrottle();
+}
+function asThrottle(v) {
+  engineAudio.throttle = (parseInt(v,10)||0) / 100;
+  asApplyThrottle();
+}
+function asApplyThrottle() {
+  const p = ENGINE_PRESETS[engineAudio.preset] || ENGINE_PRESETS.hyper;
+  const t = engineAudio.throttle || 0;
+  if (engineAudio.playing && engineAudio.ctx) {
+    const now = engineAudio.ctx.currentTime;
+    const f = p.base * (1 + t * (p.top - 1));
+    engineAudio.osc.frequency.setTargetAtTime(f, now, 0.05);
+    engineAudio.osc2.frequency.setTargetAtTime(f * 1.005, now, 0.05);
+    engineAudio.filter.frequency.setTargetAtTime(700 + t * 2600, now, 0.05);
+    engineAudio.gain.gain.setTargetAtTime(0.12 + t * 0.18, now, 0.05);
+  }
+  const fill = document.getElementById('asRpm'); if (fill) fill.style.width = (t*100).toFixed(0) + '%';
+  const ro = document.getElementById('asReadout'); if (ro) ro.textContent = t < 0.04 ? '怠速' : (Math.round(t*8000)) + ' RPM';
+}
+function asPlay() {
+  if (engineAudio.playing) return;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) { alert(t('Web Audio not supported in this browser')); return; }
+  if (!engineAudio.ctx) engineAudio.ctx = new Ctx();
+  const ctx = engineAudio.ctx;
+  if (ctx.state === 'suspended') ctx.resume();
+  const p = ENGINE_PRESETS[engineAudio.preset] || ENGINE_PRESETS.hyper;
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator(), osc2 = ctx.createOscillator();
+  const filter = ctx.createBiquadFilter(), gain = ctx.createGain();
+  osc.type = p.type; osc2.type = p.type;
+  filter.type = 'lowpass'; filter.frequency.value = 700;
+  gain.gain.value = 0.0001;
+  osc.connect(filter); osc2.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  osc.frequency.value = p.base; osc2.frequency.value = p.base * 1.005;
+  osc.start(now); osc2.start(now);
+  engineAudio.osc = osc; engineAudio.osc2 = osc2; engineAudio.filter = filter; engineAudio.gain = gain;
+  engineAudio.playing = true;
+  gain.gain.exponentialRampToValueAtTime(0.12, now + 0.15);
+  asApplyThrottle();
+  const play = document.getElementById('asPlay'); if (play) play.disabled = true;
+  const stop = document.getElementById('asStop'); if (stop) stop.disabled = false;
+}
+function asStop() {
+  if (!engineAudio.playing) return;
+  const ctx = engineAudio.ctx;
+  try {
+    const now = ctx.currentTime;
+    engineAudio.gain.gain.cancelScheduledValues(now);
+    engineAudio.gain.gain.setTargetAtTime(0.0001, now, 0.08);
+    engineAudio.osc.stop(now + 0.3);
+    engineAudio.osc2.stop(now + 0.3);
+  } catch (e) {}
+  engineAudio.playing = false;
+  engineAudio.osc = engineAudio.osc2 = engineAudio.filter = engineAudio.gain = null;
+  const play = document.getElementById('asPlay'); if (play) play.disabled = false;
+  const stop = document.getElementById('asStop'); if (stop) stop.disabled = true;
+}
+
+// ====== Emergency Command Center (real interactive dashboard) ======
+// Per-app state persisted in localStorage under key `emc_<appId>`, isolated by app_id.
+const EMC_CHECKS = {
+  en: [{k:'fire',label:'Fire',items:['Smoke alarm tested','Fire extinguisher in reach','Fire escape plan known']},
+       {k:'earthquake',label:'Earthquake',items:['Heavy furniture secured','Emergency kit ready','Safe spot identified']},
+       {k:'flood',label:'Flood',items:['Valuables raised','Sump pump tested','Water shut-off located']},
+       {k:'power',label:'Power outage',items:['Flashlights ready','Batteries charged','Non-perishable food stocked']}],
+  zh: [{k:'fire',label:'火灾',items:['烟雾报警器已测试','灭火器随手可取','逃生路线已明确']},
+       {k:'earthquake',label:'地震',items:['大型家具已固定','应急包已准备','安全角已确定']},
+       {k:'flood',label:'洪水',items:['贵重物品已垫高','排水泵已测试','进水阀已定位']},
+       {k:'power',label:'停电',items:['手电筒已备好','电池已充电','耐储食物已备足']}]
+};
+const EMC_GUIDES = {
+  en: {'fire':['Call 911 / local fire dept','Evacuate immediately, stay low under smoke','Meet at the family meeting point','Do not re-enter until fire dept clears'],
+       'earthquake':['Drop, cover, hold on under sturdy furniture','Stay away from windows & heavy objects','If outdoors, move to open ground','After shaking: check for injuries & gas leak'],
+       'flood':['Move to higher ground immediately','Turn off gas & electricity if safe','Do not walk or drive through floodwater','Listen to emergency radio / alerts'],
+       'power':['Check if neighbors are affected','Unplug sensitive electronics','Use flashlights, not candles','Keep fridge closed to preserve food']},
+  zh: {'fire':['拨打 119 火警电话','立即撤离，弯腰低姿避开烟雾','到家庭集合点汇合','消防解除前进勿返回'],
+       'earthquake':['伏地、遮挡、抓牢（躲到坚固家具下）','远离窗户和重物','在户外则转移到空旷地带','震动停止后：检查受伤与燃气泄漏'],
+       'flood':['立即转移到高处','确认安全后关闭燃气与电源','切勿涉水行走或驾车','收听应急广播与预警'],
+       'power':['确认是否周边停电','拔掉精密电子设备插头','用手电筒照明，勿用蜡烛','保持冰箱关闭以保鲜食物']}
+};
+function emcStore(appId) {
+  const key = 'emc_' + appId;
+  const def = () => ({ contacts:[], medical:{blood:'',allergies:'',meds:''}, checks:{}, supplies:[] });
+  try { const s = localStorage.getItem(key); return s ? Object.assign(def(), JSON.parse(s)) : def(); }
+  catch(e){ return def(); }
+}
+function emcSave(appId) { localStorage.setItem('emc_' + appId, JSON.stringify(emcState)); emcState.ts = Date.now(); }
+let emcState = null;
+function renderEmergency(app) {
+  const d = currentLang === 'zh-CN' ? EMC_CHECKS.zh : EMC_CHECKS.en;
+  const g = currentLang === 'zh-CN' ? EMC_GUIDES.zh : EMC_GUIDES.en;
+  emcState = emcStore(app.id);
+  const checksHTML = d.map(cg =>
+    `<fieldset class="emc-chk"><legend>${esc(cg.label)}</legend>
+       ${cg.items.map((it,i)=>`<label class="emc-ck"><input type="checkbox" ${(emcState.checks[cg.k]||[])[i]?'checked':''} onchange="emcToggle('${cg.k}',${i}, this.checked)">${esc(it)}</label>`).join('')}
+     </fieldset>`).join('');
+  const guideTabs = Object.keys(g).map(k=>`<button class="emc-gtab" data-g="${k}" onclick="emcGuide('${k}')">${esc(g[k] ? (currentLang==='zh-CN'?t('Fire'):k) : '')}</button>`).join('');
+  const contactRows = (emcState.contacts||[]).map((c,i)=>`<div class="emc-ct"><span class="emc-ct-name">${esc(c.name)}</span><span class="emc-ct-rel">${esc(c.rel||'')}</span><a class="emc-ct-call" href="tel:${esc(c.phone)}">📞 ${esc(c.phone)}</a><button class="emc-del" onclick="emcDelContact(${i})">✕</button></div>`).join('');
+  const supplyRows = (emcState.supplies||[]).map((s,i)=>{ const exp = s.expire ? `<span class="emc-supp-exp${emcExpired(s.expire)?' over':''}">${t('Expires: ')}${esc(s.expire)}</span>` : ''; return `<div class="emc-supp"><b>${esc(s.name)}</b><span>×${esc(s.qty||1)}</span>${exp}<button class="emc-del" onclick="emcDelSupply(${i})">✕</button></div>`; }).join('');
+  return `<div class="app-ui emc">
+    <div class="emc-grid">
+      <section class="emc-card">
+        <h4>📞 ${t('Emergency Contacts')}</h4>
+        <div class="emc-cts">${contactRows || `<div class="emc-empty">${t('No contacts yet')}</div>`}</div>
+        <div class="emc-add">
+          <input id="emcCName" placeholder="${t('Name')}" /> <input id="emcCRel" placeholder="${t('Relation')}" style="width:90px"/> <input id="emcCPhone" placeholder="${t('Phone')}" />
+          <button onclick="emcAddContact()">${t('Add')}</button>
+        </div>
+      </section>
+      <section class="emc-card">
+        <h4>🏥 ${t('Medical Info Card')}</h4>
+        <label>${t('Blood type')}</label><input id="emcBlood" value="${esc(emcState.medical.blood||'')}" placeholder="A+ / B− / O−" />
+        <label>${t('Allergies')}</label><input id="emcAl" value="${esc(emcState.medical.allergies||'')}" placeholder="${t('List allergies…')}" />
+        <label>${t('Medications')}</label><input id="emcMeds" value="${esc(emcState.medical.meds||'')}" placeholder="${t('Active prescriptions…')}" />
+        <button class="emc-save" onclick="emcSaveMedical()">${t('Save Medical Card')}</button>
+      </section>
+      <section class="emc-card emc-wide">
+        <h4>🧯 ${t('Household Emergency Checklist')}</h4>
+        <div class="emc-checks">${checksHTML}</div>
+      </section>
+      <section class="emc-card">
+        <h4>🎒 ${t('Supply Inventory')}</h4>
+        <div class="emc-supps">${supplyRows || `<div class="emc-empty">${t('No supplies yet')}</div>`}</div>
+        <div class="emc-add">
+          <input id="emcSName" placeholder="${t('Item')}" /> <input id="emcSQty" placeholder="${t('Qty')}" style="width:70px"/> <input id="emcSExp" placeholder="${t('Expiry')}" style="width:120px"/>
+          <button onclick="emcAddSupply()">${t('Add')}</button>
+        </div>
+      </section>
+      <section class="emc-card emc-wide">
+        <h4>🚨 ${t('Crisis Response Guide')}</h4>
+        <div class="emc-gtabs">${guideTabs}</div>
+        <ol class="emc-steps" id="emcSteps"><li class="emc-empty">${t('Select an incident type above to begin the guided response.')}</li></ol>
+      </section>
+    </div>
+  </div>`;
+}
+function emcExpired(iso) { try{ return new Date(iso+ (iso.length===10?'T00:00:00':'')).getTime() < Date.now(); }catch(e){ return false; } }
+function emcPersist(){ if(emcState) emcSave(currentAppId); }
+async function initEmergency(appId) { /* state already loaded in render */ emcGuide(Object.keys(EMC_GUIDES[ currentLang==='zh-CN'?'zh':'en'])[0]); }
+function emcToggle(cat, i, checked) {
+  if(emcState && emcState.checks){ if(!emcState.checks[cat]){ emcState.checks[cat]=[]; } emcState.checks[cat][i]=checked; emcPersist(); }
+}
+function emcAddContact() {
+  const n=$('emcCName').value.trim(), r=$('emcCRel').value.trim(), p=$('emcCPhone').value.trim();
+  if(!n||!p) return;
+  emcState.contacts.push({name:n,rel:r,phone:p}); emcPersist(); emcRerender();
+}
+function emcDelContact(i){ emcState.contacts.splice(i,1); emcPersist(); emcRerender(); }
+function emcAddSupply() {
+  const n=$('emcSName').value.trim(), q=$('emcSQty').value.trim(), e=$('emcSExp').value.trim();
+  if(!n) return; emcState.supplies.push({name:n,qty:q||'1',expire:e}); emcPersist(); emcRerender();
+}
+function emcDelSupply(i){ emcState.supplies.splice(i,1); emcPersist(); emcRerender(); }
+function emcSaveMedical(){ emcState.medical={blood:$('emcBlood').value.trim(),allergies:$('emcAl').value.trim(),meds:$('emcMeds').value.trim()}; emcPersist(); }
+function emcGuide(k) {
+  const g=(currentLang==='zh-CN'?EMC_GUIDES.zh:EMC_GUIDES.en)[k]||[];
+  document.querySelectorAll('.emc-gtab').forEach(b=>b.classList.toggle('on', b.dataset.g===k));
+  const steps=$('emcSteps'); if(!steps) return;
+  steps.innerHTML = g.map((s,i)=>`<li><b>${i+1}.</b> ${esc(s)}</li>`).join('');
+}
+function emcRerender(){ const app={id:currentAppId}; const html=renderEmergency(app); $('winBody').innerHTML=html; /* keep window chrome */ }
+
+// ====== Screensaver engine (real slideshow for the 5 screensaver apps) ======
+// Theme data: each slide is a generated image (text→image API) + caption. Graceful fallback to a
+// styled typographic card if an image fails to load, so the app is never blank.
+const SS_THEMES = {
+  'screensaver-calligraphy': {
+    titleKey:'书法艺术屏保', ar:'landscape_16_9',
+    slides: [{p:'Chinese calligraphy artwork of the character 永 in flowing semi-cursive script, ink on aged xuan paper, minimalist elegant, large brush strokes', t:'永 · 行云流水'},{p:'Classic Chinese calligraphy couplet, black ink on white paper, ancient seal style, vertical composition, museum quality', t:'大江东去 · 苏轼'},{p:'Chinese calligraphy masterpiece work of poet Li Bai, bold regular script, ink wash paper texture, art gallery', t:'静夜思 · 李白'},{p:'Cursive Chinese calligraphy of the word 龍, powerful sweeping strokes, dramatic ink, traditional', t:'龍 · 神采飞扬'}]
+  },
+  'screensaver-art': {
+    titleKey:'唯美艺术屏保', ar:'landscape_16_9',
+    slides: [{p:'The Mona Lisa style renaissance portrait painting, oil on canvas, soft chiaroscuro lighting, museum frame', t:'蒙娜丽莎 · 文艺复兴'},{p:'Starry Night inspired swirling night sky oil painting, thick impasto, van gogh style, vibrant blue and yellow', t:'星月夜 · 印象派'},{p:'Water lilies pond painting, impressionist, soft pastel reflections, claude monet style, tranquil', t:'睡莲 · 印象派'},{p:'The Persistence of Memory surreal melting clocks painting, dali style, dreamlike desert landscape', t:'记忆的永恒 · 超现实主义'}]
+  },
+  'screensaver-landscape': {
+    titleKey:'风景如画屏保', ar:'landscape_16_9',
+    slides: [{p:'Majestic Himalayan snow-capped mountain range at sunrise, golden light, misty valleys, epic 4k nature photography', t:'喜马拉雅 · 黎明'},{p:'Tropical turquoise ocean beach with soft white sand and gentle waves, azure sky, tropical paradise', t:'热带海岸 · 碧海'},{p:'Bamboo grove with dappled sunlight through misty leaves, serene eastern forest, morning light', t:'竹林 · 晨光'},{p:'Aurora borealis over snow field and pine forest, green and purple northern lights, starry night', t:'极光 · 星空'}]
+  },
+  'screensaver-anime': {
+    titleKey:'动漫世界屏保', ar:'landscape_16_9',
+    slides: [{p:'Studio Ghibli style lush green countryside with small house and blue sky, soft clouds, hand painted anime scenery, wholesome', t:'治愈田野 · 吉卜力'},{p:'Makoto Shinkai style anime city street at sunset, glowing orange sky, clouds, high school rooftops, atmospheric', t:'夕阳街角 · 新海诚'},{p:'Anime starry night sky over serene japanese garden with cherry blossoms, fantasy colors, beautiful', t:'星夜庭园 · 夜幕'},{p:'Whimsical anime floating island with waterfalls and castle, fantasy landscape, vibrant clean style, kid friendly', t:'天空之城 · 幻想'}]
+  },
+  'screensaver-funny': {
+    titleKey:'搞笑趣图屏保', ar:'landscape_16_9',
+    slides: [{p:'A cheerful orange cat with an amused expression wearing tiny round glasses, funny wholesome photo, bright background', t:'喵星学霸', pn:'😸'},{p:'A happy golden retriever puppy with its head tilted curiously, funny cute animal photo, colorful', t:'好奇狗狗', pn:'🐶'},{p:'A panda eating bamboo happily sitting in a tree, cute funny photo, vibrant green forest', t:'吃货滚滚', pn:'🐼'},{p:'Wholesome funny quote card over pastel background, cute font, dancing vegetables cartoon, happy', t:'开心一刻 · 生活多美好', pn:'🥕'}]
+  }
+};
+let ssTimer = null, ssIdx = 0;
+function renderScreensaver(app) {
+  const th = SS_THEMES[app.id] || SS_THEMES['screensaver-art'];
+  const prefs = (()=>{ try{return JSON.parse(localStorage.getItem('ssx_'+app.id)||'{}');}catch(e){return {};} })();
+  const dot = (prefs.showClock!==false); const v = prefs.interval||8;
+  const dots = th.slides.map((_,i)=>`<span class="ss-dot${i===0?' on':''}" onclick="ssGo(${i})"></span>`).join('');
+  return `<div class="app-ui ss">
+    ${th.slides.map((s,i)=>`<div class="ss-slide" data-i="${i}">
+      <img class="ss-img" src="${imgURL(s.p, th.ar)}" alt="" onerror="ssImgFail(this)">
+      <div class="ss-cap">${esc(s.t||'')}${s.pn?(' '+s.pn):''}</div>
+    </div>`).join('')}
+    <div class="ss-overlay">
+      <div class="ss-clock" style="display:${dot?'block':'none'}">00:00</div>
+      <div class="ss-dots">${dots}</div>
+      <div class="ss-controls">
+        <button onclick="ssPrev()">◀</button>
+        <button onclick="ssToggleClock()">🕐</button>
+        <select onchange="ssInterval(this.value)">
+          <option value="4" ${v===4?'selected':''}>4s</option>
+          <option value="8" ${v===8?'selected':''}>8s</option>
+          <option value="15" ${v===15?'selected':''}>15s</option>
+          <option value="30" ${v===30?'selected':''}>30s</option>
+        </select>
+        <button onclick="ssNext()">▶</button>
+      </div>
+    </div>
+  </div>`;
+}
+function imgURL(p,ar){ return 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt='+encodeURIComponent(p)+'&image_size='+ar; }
+function ssImgFail(el){ const slide=el.closest('.ss-slide'); if(slide){ slide.classList.add('ss-fail'); slide.style.background='linear-gradient(135deg,#141e30,#243b55)'; } el.style.display='none'; }
+function ssRunners(){ return document.querySelectorAll('.app-ui.ss .ss-slide'); }
+function ssShow(i){ const slides=ssRunners(); if(!slides.length)return; ssIdx=((i%slides.length)+slides.length)%slides.length; slides.forEach((s,idx)=>s.classList.toggle('on',idx===ssIdx)); document.querySelectorAll('.ss-dot').forEach((d,idx)=>d.classList.toggle('on',idx===ssIdx)); }
+function ssNext(){ ssShow(ssIdx+1); }
+function ssPrev(){ ssShow(ssIdx-1); }
+function ssGo(i){ ssShow(i); ssRestart(); }
+function ssToggleClock(){ const c=ssRunners()[0]&&ssRunners()[0].parentElement.querySelector('.ss-clock'); if(c){ const on=c.style.display!=='none'; c.style.display=on?'none':'block'; }
+  const prefs=JSON.parse(localStorage.getItem('ssx_'+currentAppId)||'{}'); prefs.showClock=!on; localStorage.setItem('ssx_'+currentAppId,JSON.stringify(prefs));
+}
+function ssInterval(v){ const prefs=JSON.parse(localStorage.getItem('ssx_'+currentAppId)||'{}'); prefs.interval=+v; localStorage.setItem('ssx_'+currentAppId,JSON.stringify(prefs)); ssRestart(); }
+function ssRestart(){ if(ssTimer)clearInterval(ssTimer); const prefs=JSON.parse(localStorage.getItem('ssx_'+currentAppId)||'{}'); const v=(prefs.interval||8)*1000; ssTimer=setInterval(()=>ssNext(), v); }
+function ssClockTick(){ const c=document.querySelector('.app-ui.ss .ss-clock'); if(!c)return; const d=new Date(), h=String(d.getHours()).padStart(2,'0'), m=String(d.getMinutes()).padStart(2,'0'); c.textContent=h+':'+m; }
+function initScreensaver(appId){ ssShow(0); ssRestart(); setInterval(ssClockTick,1000); ssClockTick(); }
 
 // ---- Todo ----
 function renderTodo(app) {
@@ -2369,8 +2950,8 @@ function applyFilter(type) {
 function renderPomodoro(app) {
   return `<div class="app-ui pomodoro">
     <div class="pm-ring">
-      <div class="pm-time" id="pmTime">${esc(pm.formatTime(pm.duration))}</div>
-      <div class="pm-mode" id="pmMode">${t('Focus')}</div>
+      <div class="pm-time" id="pmTime">${esc(pm.formatTime(pm.remaining))}</div>
+      <div class="pm-mode" id="pmMode">${pm.mode === 'focus' ? t('Focus') : t('Break')}</div>
       <div class="pm-progress"><div class="pm-fill" id="pmFill"></div></div>
     </div>
     <div class="pm-btns">
@@ -2383,8 +2964,29 @@ function renderPomodoro(app) {
 }
 let pm = {
   duration: 25 * 60, remaining: 25 * 60, running: false, timer: null, mode: 'focus',
+  // 计时状态按应用持久化到 IndexedDB，避免离开/返回应用（如进入应用市场）后状态被重置
+  key() { return 'pmtimer_' + currentAppId; },
+  persist() { if (currentAppId) idbSetJSON(this.key(), { duration: this.duration, remaining: this.remaining, mode: this.mode, running: this.running, savedAt: Date.now() }); },
+  // 从持久化状态恢复（返回应用 / 刷新页面后再次打开时调用），而非无条件重置
+  restore() {
+    this.stopTimer();
+    idbGetJSON(this.key()).then(d => {
+      if (!d) { this.reset(); return; }
+      this.duration = d.duration; this.remaining = d.remaining; this.mode = d.mode; this.running = false;
+      // 若离开前正在计时，扣除后台流逝的时间，保持连续
+      if (d.running && this.remaining > 0) {
+        const elapsed = Math.floor((Date.now() - (d.savedAt || Date.now())) / 1000);
+        this.remaining = Math.max(0, this.remaining - elapsed);
+      }
+      const el = document.getElementById('pmStart');
+      if (el) el.textContent = d.running ? t('Pause') : t('Start');
+      this.render();
+      if (d.running && this.remaining > 0) this.start();
+      else if (d.running && this.remaining <= 0) { this.remaining = 0; this.complete(); }
+    });
+  },
   formatTime(s) { const m = Math.floor(s / 60); const ss = s % 60; return String(m).padStart(2, '0') + ':' + String(ss).padStart(2, '0'); },
-  next() { this.stopTimer(); this.mode = this.mode === 'focus' ? 'break' : 'focus'; this.duration = this.mode === 'focus' ? 25 * 60 : 5 * 60; this.remaining = this.duration; this.render(); },
+  next() { this.stopTimer(); this.mode = this.mode === 'focus' ? 'break' : 'focus'; this.duration = this.mode === 'focus' ? 25 * 60 : 5 * 60; this.remaining = this.duration; this.render(); this.persist(); },
   toggle() {
     if (this.running) { this.pause(); }
     else if (this.remaining <= 0) { this.next(); this.start(); }
@@ -2393,14 +2995,15 @@ let pm = {
   start() {
     if (this.running) return;
     this.running = true;
-    document.getElementById('pmStart').textContent = t('Pause');
+    const el = document.getElementById('pmStart'); if (el) el.textContent = t('Pause');
+    this.persist();
     this.timer = setInterval(() => {
       this.remaining--;
       if (this.remaining <= 0) { this.remaining = 0; this.complete(); }
-      this.render();
+      else { this.render(); this.persist(); }
     }, 1000);
   },
-  pause() { this.running = false; this.stopTimer(); document.getElementById('pmStart').textContent = t('Resume'); },
+  pause() { this.running = false; this.stopTimer(); const el = document.getElementById('pmStart'); if (el) el.textContent = t('Resume'); this.persist(); },
   stopTimer() { if (this.timer) { clearInterval(this.timer); this.timer = null; } },
   complete() {
     this.stopTimer(); this.running = false;
@@ -2408,10 +3011,10 @@ let pm = {
     addDailyStat(currentAppId, m);
     if (this.mode === 'focus') refreshPomodoroUi();
     this.next();
-    document.getElementById('pmStart').textContent = t('Start');
+    const el = document.getElementById('pmStart'); if (el) el.textContent = t('Start');
     renderPomodoroLog();
   },
-  reset() { this.stopTimer(); this.running = false; this.duration = 25 * 60; this.remaining = this.duration; this.mode = 'focus'; const el = document.getElementById('pmStart'); if (el) el.textContent = t('Start'); this.render(); renderPomodoroLog(); },
+  reset() { this.stopTimer(); this.running = false; this.duration = 25 * 60; this.remaining = this.duration; this.mode = 'focus'; const el = document.getElementById('pmStart'); if (el) el.textContent = t('Start'); this.render(); renderPomodoroLog(); this.persist(); },
   render() {
     const timeEl = document.getElementById('pmTime'); if (timeEl) timeEl.textContent = pm.formatTime(this.remaining);
     const mo = document.getElementById('pmMode'); if (mo) mo.textContent = this.mode === 'focus' ? t('Focus') : t('Break');
@@ -2642,6 +3245,7 @@ function maximizeApp() {
 }
 function minimizeApp() {
   if (!_appData || !_appData.app) return;
+  cacheCurrentWindow();   // 缓存当前应用运行时 DOM，切走再切回不丢状态
   _activeAppId = null;
   closeWindow(false);  // 最小化时保留 URL，方便收藏
   updateDockHighlight();
@@ -2650,6 +3254,7 @@ function minimizeApp() {
 
 function closeApp() {
   if (!_appData || !_appData.app) return;
+  _winCache.delete(_appData.app.id);  // 彻底关闭，丢弃缓存的运行时 DOM
   _activeAppId = null;
   closeWindow(true);  // 关闭时清除 URL
   backgroundApps = backgroundApps.filter(a => a.id !== _appData.app.id);
@@ -2657,6 +3262,7 @@ function closeApp() {
   updateDockHighlight();
   _appData = null;
   currentAppId = null;
+  restoreSysAfterApp();   // 若应用是从市场/我的应用打开，关闭后还原该系统窗口
 }
 
 function closeWindow(clearUrl) {
@@ -2724,6 +3330,7 @@ function reopenApp(id) {
 }
 function killApp(id) {
   backgroundApps = backgroundApps.filter(a => a.id !== id);
+  _winCache.delete(id);  // 从任务栏移除时也释放缓存的运行时 DOM
   if (currentAppId === id) { closeWindow(); _appData = null; currentAppId = null; }
   renderTaskbar();
 }
@@ -2837,6 +3444,7 @@ async function renderStandalone(id) {
       return;
     }
     const app = data.app;
+    currentAppId = app.id;   // 供 pomodoro 计时状态按应用持久化/恢复
     document.title = seedName(app) + ' · aiapp';
     const root = document.createElement('div');
     root.id = 'standaloneRoot';
@@ -2844,7 +3452,7 @@ async function renderStandalone(id) {
     document.body.appendChild(root);
     // Init per-template UI (same as the in-app window); no open animation on refresh.
     if (app.template === 'todo' && document.getElementById('todoList')) initTodo(app.id);
-    if (app.template === 'pomodoro' && document.getElementById('pmTime')) { pm.reset(); refreshPomodoroUi(); renderPomodoroLog(); }
+    if (app.template === 'pomodoro' && document.getElementById('pmTime')) { pm.restore(); refreshPomodoroUi(); renderPomodoroLog(); }
     if (app.template === 'memory-game' && document.getElementById('memGrid')) memNew();
     if (app.template === 'tv-movies' && document.getElementById('tvList')) renderTv();
     // Branding bar at the bottom; hidden entirely for paid apps (hide_branding).

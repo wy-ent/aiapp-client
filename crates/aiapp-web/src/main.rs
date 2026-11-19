@@ -106,6 +106,13 @@ struct AppUser {
     /// Password hash (bcrypt). Not serialized externally.
     #[serde(skip_serializing)]
     password_hash: String,
+    /// Per-user AI API key (OpenAI-compatible). Empty = use server env config.
+    #[serde(skip_serializing)]
+    ai_api_key: String,
+    /// Per-user AI API base URL (OpenAI-compatible). Empty = use server default.
+    ai_base_url: String,
+    /// Per-user AI model name. Empty = use server default.
+    ai_model: String,
 }
 
 /// App state: shared working directory + market list + user list + active prompt + persistence layer.
@@ -275,6 +282,32 @@ struct ActionResponse {
     ok: bool,
     error: Option<String>,
     app: Option<MarketApp>,
+}
+
+/// Import-a-project request body (IDE-authored apps); use the same rules as the
+/// LLM generate/publish flow.
+#[derive(Deserialize)]
+struct ImportRequest {
+    /// App name (required).
+    name: String,
+    /// IDE-written app content (the app `source`, rendered by the same runtime
+    /// as generated apps).
+    source: String,
+    #[serde(default)]
+    description: String,
+    #[serde(default)]
+    tags: Vec<String>,
+    #[serde(default)]
+    category: String,
+    /// Share scope: "private" (default) / "org" / "public".
+    #[serde(default)]
+    share: String,
+    /// Template hint used to derive a default category (default `minimal`).
+    #[serde(default)]
+    template: String,
+    /// App type: "app" (regular) / "web" (standalone webpage).
+    #[serde(default)]
+    kind: String,
 }
 
 /// App detail response.
@@ -536,6 +569,9 @@ pub async fn router() -> Router {
             created_at: "2026-08-18".into(),
             installed: Vec::new(),
             password_hash: auth::hash_password(&cfg.admin_password),
+            ai_api_key: String::new(),
+            ai_base_url: String::new(),
+            ai_model: String::new(),
         });
     }
 
@@ -624,9 +660,13 @@ pub async fn router() -> Router {
         .route("/api/generate", post(generate))
         .route("/api/my-apps", get(list_my_apps))
         .route("/api/publish", post(publish_app))
+        .route("/api/import-app", post(import_app))
         .route("/api/report", post(report_app))
         .route("/api/delete", post(delete_app))
         .route("/api/uninstall", post(uninstall_app))
+        // —— User settings (requires login) ——
+        .route("/api/settings", get(get_settings))
+        .route("/api/settings", post(save_settings))
         // —— Admin (requires admin role) ——
         .route("/api/admin/users", get(admin_users))
         .route("/api/admin/user/toggle", post(admin_user_toggle))
@@ -695,6 +735,9 @@ async fn ensure_admin(db: &db::Database, cfg: &config::AppConfig, users: &mut Ve
         created_at: chrono_now(),
         installed: Vec::new(),
         password_hash: auth::hash_password(&cfg.admin_password),
+        ai_api_key: String::new(),
+        ai_base_url: String::new(),
+        ai_model: String::new(),
     };
     db.save_user(&u).await;
     users.push(u);
@@ -1130,6 +1173,20 @@ fn mock_app_content(template: &str, name: &str, lang: &str) -> String {
                  支持时间戳↔时间互转，点击日期选择器快速选择时间",
                 name
             ),
+            "audio-sim" => format!(
+                "应用「{}」已启动 [引擎声浪模拟器]\n\n\
+                 ┌─────────────────────────────┐\n\
+                 │ 🏎 引擎声浪模拟         🔊  │\n\
+                 ├─────────────────────────────┤\n\
+                 │  超跑 肌肉车 JDM 经典 电动   │\n\
+                 │                             │\n\
+                 │   ▁▃▅▇ 虚拟油门 RPM ▇▅▃▁   │\n\
+                 ├─────────────────────────────┤\n\
+                 │ 选择车型，踩油门听实时声浪   │\n\
+                 └─────────────────────────────┘\n\n\
+                 由 Web Audio 实时合成，无需音频文件",
+                name
+            ),
             _ => format!(
                 "应用「{}」已启动 [Hello World]\n\n\
                  ┌─────────────────────────────┐\n\
@@ -1240,6 +1297,20 @@ fn mock_app_content(template: &str, name: &str, lang: &str) -> String {
                  Convert between Unix timestamps and human-readable time;\npick a date with the built-in date picker",
                 name
             ),
+            "audio-sim" => format!(
+                "App \"{}\" launched [Engine Sound Simulator]\n\n\
+                 ┌─────────────────────────────┐\n\
+                 │ 🏎 Engine Sound Sim     🔊  │\n\
+                 ├─────────────────────────────┤\n\
+                 │  Hyper Muscle JDM Classic EV  │\n\
+                 │                             │\n\
+                 │   ▁▃▅▇ throttle RPM ▇▅▃▁   │\n\
+                 ├─────────────────────────────┤\n\
+                 │ Pick a model, rev the throttle│\n\
+                 └─────────────────────────────┘\n\n\
+                 Synthesized live with Web Audio — no audio files needed",
+                name
+            ),
             _ => format!(
                 "App \"{}\" launched [Hello World]\n\n\
                  ┌─────────────────────────────┐\n\
@@ -1332,7 +1403,23 @@ async fn generate(
     );
     let project_dir = state.workdir.join(&dir_name);
 
-    let config = GenConfig::from_env();
+    // Build gen config: start from env, then override with per-user settings if present.
+    let mut config = GenConfig::from_env();
+    {
+        let users = state.users.lock().await;
+        if let Some(u) = users.iter().find(|u| u.id == auth.id) {
+            if !u.ai_api_key.is_empty() {
+                config.api_key = u.ai_api_key.clone();
+                config.backend = aiapp_gen::Backend::OpenAi;
+            }
+            if !u.ai_base_url.is_empty() {
+                config.base_url = u.ai_base_url.clone();
+            }
+            if !u.ai_model.is_empty() {
+                config.model = u.ai_model.clone();
+            }
+        }
+    }
     let override_prompt = state.prompt.lock().await.clone();
 
     let result = match generate_source_with_prompt(&description, &config, template, &override_prompt) {
@@ -1500,6 +1587,108 @@ fn market_len(market: &[MarketApp]) -> usize {
     market.len()
 }
 
+/// Import an IDE-authored app into the market, applying the exact same rules as
+/// the LLM generate path: category auto-review, share scope, and lifecycle
+/// status are computed identically, and the app is owned by the current user.
+async fn import_app(
+    State(state): State<Arc<AppState>>,
+    auth: auth::AuthUser,
+    Json(req): Json<ImportRequest>,
+) -> Json<ActionResponse> {
+    let name = req.name.trim().to_string();
+    let source = req.source.trim_start().to_string();
+    if name.is_empty() {
+        return Json(ActionResponse {
+            ok: false,
+            error: Some("Please enter an app name".into()),
+            app: None,
+        });
+    }
+    if source.is_empty() {
+        return Json(ActionResponse {
+            ok: false,
+            error: Some("App source content cannot be empty".into()),
+            app: None,
+        });
+    }
+
+    let template = if req.template.trim().is_empty() {
+        "minimal"
+    } else {
+        req.template.trim()
+    };
+
+    // Category auto-review: explicit choice takes priority, otherwise derived from the template.
+    let category = {
+        let c = req.category.trim().to_string();
+        if APP_CATEGORIES.iter().any(|(k, _)| *k == c) {
+            c
+        } else {
+            default_category_for(template)
+        }
+    };
+    // Share scope: only private / org / public; anything else falls back to private.
+    let share = match req.share.trim() {
+        "org" => "org".to_string(),
+        "public" => "public".to_string(),
+        _ => "private".to_string(),
+    };
+
+    let now = chrono_now();
+    let app_id = format!("imp_{}", market_len(&state.market.lock().await) + 1);
+    let app_entry = MarketApp {
+        id: app_id.clone(),
+        name,
+        description: req.description.trim().to_string(),
+        tags: req.tags.iter().filter(|s| !s.is_empty()).cloned().collect(),
+        platforms: vec!["Web".into(), "Mobile".into(), "Desktop".into()],
+        template: template.to_string(),
+        source,
+        created_at: now,
+        version: "1.0.0".into(),
+        owner: auth.id.clone(),
+        visibility: "private".into(),
+        // Same lifecycle rule as generate: tool/office auto-approve, the rest enter manual review.
+        status: if category_requires_review(&category) {
+            "reviewing".into()
+        } else {
+            "draft".into()
+        },
+        launches: 0,
+        report: String::new(),
+        review_note: String::new(),
+        wasm: None,
+        tier: "open".into(),
+        category,
+        share,
+        net: "local".into(),
+        kind: if req.kind.trim() == "web" { "web".into() } else { "app".into() },
+        hide_branding: false,
+    };
+
+    let cloned = app_entry.clone();
+    {
+        let mut market = state.market.lock().await;
+        market.push(app_entry);
+    }
+    {
+        let mut users = state.users.lock().await;
+        if let Some(u) = users.iter_mut().find(|u| u.id == auth.id) {
+            u.apps_generated += 1;
+        }
+    }
+    state.db.save_app(&cloned).await;
+    {
+        let users = state.users.lock().await;
+        if let Some(u) = users.iter().find(|u| u.id == cloned.owner) {
+            state.db.save_user(u).await;
+        }
+    }
+    state.telemetry.report("app_import", json!({ "template": template }));
+
+    Json(ActionResponse { ok: true, error: None, app: Some(cloned) })
+}
+
 /// Simple truncation of long strings.
 fn truncate(s: &str, max: usize) -> String {
     if s.chars().count() <= max {
@@ -1600,6 +1789,16 @@ fn serve_wasm_bytes(bytes: Vec<u8>) -> Response {
 /// warning and does not propagate, to avoid blocking startup or requests.
 async fn build_and_store_wasm(state: &Arc<AppState>, app: &MarketApp) -> bool {
     let id = app.id.clone();
+    // Web-kind apps render from their own source (e.g. a `data:text/html,...` URL or inline HTML)
+    // and have no WASM business logic, so they must NOT be compiled with moon. Guard both on the
+    // explicit kind flag and on the raw source (a `data:` URL can never be MoonBit code).
+    let src_trim = app.source.trim_start();
+    let is_html_source =
+        src_trim.starts_with("data:text/html") || src_trim.starts_with("<!doctype html")
+            || src_trim.starts_with("<html");
+    if app.kind == "web" || is_html_source {
+        return true;
+    }
     let key = format!("apps/{id}/main.wasm");
 
     // Idempotent: if the local backend already has the artifact (persisted by a previous run), mark it and
@@ -1760,6 +1959,9 @@ async fn register(
         created_at: chrono_now(),
         installed: Vec::new(),
         password_hash: auth::hash_password(&req.password),
+        ai_api_key: String::new(),
+        ai_base_url: String::new(),
+        ai_model: String::new(),
     };
     state.db.save_user(&u).await;
     {
@@ -1803,6 +2005,9 @@ async fn login(
                 created_at: "2026-08-18".into(),
                 installed: Vec::new(),
                 password_hash: String::new(),
+                ai_api_key: String::new(),
+                ai_base_url: String::new(),
+                ai_model: String::new(),
             };
             return auth::login_response(&token, &u).into_response();
         }
@@ -1840,6 +2045,105 @@ async fn auth_me(
         "ok": true,
         "user": { "id": auth.id, "name": name, "role": auth.role }
     }))
+}
+
+// ====== User settings (per-user AI API config + usage) ======
+
+/// GET /api/settings — return the current user's AI config (API key masked) and usage stats.
+async fn get_settings(
+    State(state): State<Arc<AppState>>,
+    auth: auth::AuthUser,
+) -> Json<serde_json::Value> {
+    let u = {
+        let users = state.users.lock().await;
+        users.iter().find(|u| u.id == auth.id).cloned()
+    };
+
+    let env_config = GenConfig::from_env();
+    let server_backend = match env_config.backend {
+        aiapp_gen::Backend::Mock => "mock",
+        aiapp_gen::Backend::OpenAi => "openai",
+        aiapp_gen::Backend::Pro => "pro",
+    };
+
+    let (ai_api_key, ai_base_url, ai_model, apps_generated, launches) = match u {
+        Some(u) => (
+            mask_key(&u.ai_api_key),
+            u.ai_base_url,
+            u.ai_model,
+            u.apps_generated,
+            u.launches,
+        ),
+        None => (String::new(), String::new(), String::new(), 0, 0),
+    };
+
+    Json(json!({
+        "ok": true,
+        "settings": {
+            "ai_api_key": ai_api_key,
+            "ai_base_url": ai_base_url,
+            "ai_model": ai_model,
+            "has_key": !ai_api_key.is_empty(),
+        },
+        "server": {
+            "backend": server_backend,
+            "base_url": env_config.base_url,
+            "model": env_config.model,
+        },
+        "usage": {
+            "apps_generated": apps_generated,
+            "launches": launches,
+        }
+    }))
+}
+
+/// POST /api/settings — save the current user's AI API config.
+#[derive(Deserialize)]
+struct SettingsRequest {
+    #[serde(default)]
+    ai_api_key: String,
+    #[serde(default)]
+    ai_base_url: String,
+    #[serde(default)]
+    ai_model: String,
+}
+
+/// Mask an API key for display: show first 4 + last 4 chars, mask the middle.
+fn mask_key(key: &str) -> String {
+    if key.is_empty() {
+        return String::new();
+    }
+    let len = key.len();
+    if len <= 8 {
+        return "****".into();
+    }
+    format!("{}****{}", &key[..4], &key[len - 4..])
+}
+
+async fn save_settings(
+    State(state): State<Arc<AppState>>,
+    auth: auth::AuthUser,
+    Json(req): Json<SettingsRequest>,
+) -> Json<serde_json::Value> {
+    let mut users = state.users.lock().await;
+    let u = match users.iter_mut().find(|u| u.id == auth.id) {
+        Some(u) => u,
+        None => {
+            return Json(json!({ "ok": false, "error": "User not found" }));
+        }
+    };
+    // If the submitted key looks like a mask (contains ****), keep the existing key.
+    if req.ai_api_key.contains("****") {
+        // Keep existing key
+    } else {
+        u.ai_api_key = req.ai_api_key.trim().to_string();
+    }
+    u.ai_base_url = req.ai_base_url.trim().to_string();
+    u.ai_model = req.ai_model.trim().to_string();
+    let cloned = u.clone();
+    drop(users);
+    state.db.save_user(&cloned).await;
+    Json(json!({ "ok": true }))
 }
 
 // ====== Reports ======

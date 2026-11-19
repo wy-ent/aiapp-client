@@ -196,6 +196,13 @@ impl Database {
         // Backfill legacy tables: add the "My Apps" (launch records) column, storing app ids as a JSON array
         self.ensure_column(pool, "users", "installed", "TEXT NOT NULL DEFAULT '[]'")
             .await;
+        // Per-user AI API config (OpenAI-compatible)
+        self.ensure_column(pool, "users", "ai_api_key", "TEXT NOT NULL DEFAULT ''")
+            .await;
+        self.ensure_column(pool, "users", "ai_base_url", "TEXT NOT NULL DEFAULT ''")
+            .await;
+        self.ensure_column(pool, "users", "ai_model", "TEXT NOT NULL DEFAULT ''")
+            .await;
 
         sqlx::query(
             r#"CREATE TABLE IF NOT EXISTS prompts (
@@ -311,13 +318,14 @@ impl Database {
         let installed = serde_json::to_string(&u.installed).unwrap_or_else(|_| "[]".into());
         let _ = sqlx::query(
             r#"INSERT INTO users
-               (id,name,role,status,apps_generated,launches,incentive,org,created_at,password_hash,installed)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?)
+               (id,name,role,status,apps_generated,launches,incentive,org,created_at,password_hash,installed,ai_api_key,ai_base_url,ai_model)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                ON CONFLICT (id) DO UPDATE SET
                  name=excluded.name, role=excluded.role, status=excluded.status,
                  apps_generated=excluded.apps_generated, launches=excluded.launches,
                  incentive=excluded.incentive, org=excluded.org, created_at=excluded.created_at,
-                 password_hash=excluded.password_hash, installed=excluded.installed"#,
+                 password_hash=excluded.password_hash, installed=excluded.installed,
+                 ai_api_key=excluded.ai_api_key, ai_base_url=excluded.ai_base_url, ai_model=excluded.ai_model"#,
         )
         .bind(&u.id)
         .bind(&u.name)
@@ -330,6 +338,9 @@ impl Database {
         .bind(&u.created_at)
         .bind(&u.password_hash)
         .bind(&installed)
+        .bind(&u.ai_api_key)
+        .bind(&u.ai_base_url)
+        .bind(&u.ai_model)
         .execute(pool)
         .await;
     }
@@ -457,5 +468,8 @@ fn row_to_user(r: &AnyRow) -> AppUser {
             .and_then(|s| serde_json::from_str(&s).ok())
             .unwrap_or_default(),
         password_hash: r.try_get("password_hash").unwrap_or_default(),
+        ai_api_key: r.try_get("ai_api_key").unwrap_or_default(),
+        ai_base_url: r.try_get("ai_base_url").unwrap_or_default(),
+        ai_model: r.try_get("ai_model").unwrap_or_default(),
     }
 }
